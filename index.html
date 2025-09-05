@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cookiejar Research App</title>
+    <title>Cookiejar - Your Research Assistant</title>
     <style>
         * {
             margin: 0;
@@ -13,12 +13,19 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
             background: linear-gradient(135deg, #f5e6d3 0%, #e8d5c4 100%);
             min-height: 100vh;
-            color: #333;
         }
 
-        .header {
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
             background: rgba(139, 69, 19, 0.95);
             color: white;
             padding: 1rem 0;
@@ -29,9 +36,6 @@
         }
 
         .header-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -40,94 +44,70 @@
         .logo {
             display: flex;
             align-items: center;
-            font-size: 1.3rem;
+            font-size: 1.5rem;
             font-weight: bold;
         }
 
         .cookie-icon {
-            width: 35px;
-            height: 35px;
+            width: 40px;
+            height: 40px;
             margin-right: 10px;
             background: #d2691e;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
+            font-size: 20px;
         }
 
-        .user-info {
+        nav ul {
             display: flex;
-            align-items: center;
-            gap: 1rem;
+            list-style: none;
+            gap: 2rem;
         }
 
-        .credits {
-            background: rgba(255,255,255,0.2);
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-size: 0.9rem;
+        nav a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s;
         }
 
-        .main-container {
-            max-width: 1000px;
-            margin: 2rem auto;
-            padding: 0 20px;
+        nav a:hover {
+            color: #f4a460;
         }
 
-        .research-card {
-            background: white;
-            border-radius: 20px;
-            padding: 2rem;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            margin-bottom: 2rem;
-        }
-
-        .research-input-section {
+        .hero {
             text-align: center;
-            margin-bottom: 2rem;
+            padding: 4rem 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(245,245,245,0.8) 100%);
+            margin: 2rem 0;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
 
-        .research-input-section h1 {
-            color: #8b4513;
+        .hero h1 {
+            font-size: 3rem;
             margin-bottom: 1rem;
-            font-size: 2rem;
+            color: #8b4513;
+            background: linear-gradient(45deg, #8b4513, #d2691e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
-        .research-input-section p {
-            color: #666;
+        .hero p {
+            font-size: 1.3rem;
             margin-bottom: 2rem;
-            font-size: 1.1rem;
-        }
-
-        .input-container {
-            position: relative;
+            color: #666;
             max-width: 600px;
-            margin: 0 auto;
+            margin-left: auto;
+            margin-right: auto;
         }
 
-        .research-input {
-            width: 100%;
-            padding: 20px;
-            border: 2px solid #ddd;
-            border-radius: 15px;
-            font-size: 1.1rem;
-            resize: vertical;
-            min-height: 80px;
-            transition: all 0.3s;
-        }
-
-        .research-input:focus {
-            outline: none;
-            border-color: #8b4513;
-            box-shadow: 0 0 20px rgba(139, 69, 19, 0.2);
-        }
-
-        .input-actions {
+        .cta-container {
             display: flex;
-            justify-content: center;
             gap: 1rem;
-            margin-top: 1rem;
+            justify-content: center;
             flex-wrap: wrap;
         }
 
@@ -135,12 +115,12 @@
             padding: 12px 30px;
             border: none;
             border-radius: 25px;
-            font-size: 1rem;
+            font-size: 1.1rem;
             cursor: pointer;
             transition: all 0.3s;
-            font-weight: 600;
             text-decoration: none;
             display: inline-block;
+            font-weight: 600;
         }
 
         .btn-primary {
@@ -149,14 +129,9 @@
             box-shadow: 0 4px 15px rgba(139, 69, 19, 0.3);
         }
 
-        .btn-primary:hover:not(:disabled) {
+        .btn-primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(139, 69, 19, 0.4);
-        }
-
-        .btn-primary:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
         }
 
         .btn-secondary {
@@ -170,510 +145,277 @@
             color: white;
         }
 
-        .processing-section {
-            display: none;
+        .demo-section {
+            padding: 3rem 0;
             text-align: center;
+        }
+
+        .demo-container {
+            background: white;
+            border-radius: 15px;
             padding: 2rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin: 2rem 0;
         }
 
-        .cookie-jar {
-            width: 100px;
-            height: 100px;
-            margin: 0 auto 2rem;
-            background: #d2691e;
-            border-radius: 50% 50% 45% 45%;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .cookie-jar::before {
-            content: '';
-            position: absolute;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80px;
-            height: 15px;
-            background: #8b4513;
-            border-radius: 10px;
-        }
-
-        .cookie-jar::after {
-            content: '🍪';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 2rem;
-            animation: cookieBounce 2s infinite;
-        }
-
-        @keyframes cookieBounce {
-            0%, 100% { transform: translate(-50%, -50%) scale(1); }
-            50% { transform: translate(-50%, -60%) scale(1.1); }
-        }
-
-        @keyframes fillJar {
-            0% { height: 0; }
-            100% { height: 70%; }
-        }
-
-        .jar-fill {
-            position: absolute;
-            bottom: 0;
-            left: 0;
+        .research-input {
             width: 100%;
-            background: linear-gradient(to top, #8b4513, #d2691e);
-            border-radius: 0 0 45% 45%;
-            animation: fillJar 3s ease-in-out infinite alternate;
-        }
-
-        .processing-steps {
-            text-align: left;
-            max-width: 400px;
-            margin: 0 auto;
-        }
-
-        .processing-step {
-            display: flex;
-            align-items: center;
-            padding: 0.5rem 0;
-            opacity: 0.3;
-            transition: opacity 0.5s;
-        }
-
-        .processing-step.active {
-            opacity: 1;
-        }
-
-        .processing-step.completed {
-            opacity: 0.7;
-            text-decoration: line-through;
-        }
-
-        .step-icon {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            background: #ddd;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 1rem;
-            font-size: 0.8rem;
-        }
-
-        .processing-step.active .step-icon {
-            background: #8b4513;
-            color: white;
-            animation: pulse 1s infinite;
-        }
-
-        .processing-step.completed .step-icon {
-            background: #28a745;
-            color: white;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-
-        .results-section {
-            display: none;
-        }
-
-        .result-card {
-            background: #f8f9fa;
-            border: 1px solid #e9ecef;
+            max-width: 600px;
+            padding: 15px;
+            border: 2px solid #ddd;
             border-radius: 10px;
-            padding: 1.5rem;
-            margin: 1rem 0;
-        }
-
-        .result-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            font-size: 1.1rem;
             margin-bottom: 1rem;
         }
 
-        .result-title {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #8b4513;
+        .research-input:focus {
+            outline: none;
+            border-color: #8b4513;
+            box-shadow: 0 0 10px rgba(139, 69, 19, 0.2);
         }
 
-        .result-stats {
-            display: flex;
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 2rem;
-            margin: 1rem 0;
+            padding: 3rem 0;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .pricing {
+            padding: 3rem 0;
             text-align: center;
         }
 
-        .stat {
-            background: white;
-            padding: 1rem;
-            border-radius: 10px;
-            flex: 1;
+        .pricing-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
         }
 
-        .stat-number {
-            font-size: 1.5rem;
+        .pricing-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .pricing-card.featured {
+            border: 3px solid #8b4513;
+            transform: scale(1.05);
+        }
+
+        .price {
+            font-size: 2.5rem;
             font-weight: bold;
             color: #8b4513;
+            margin: 1rem 0;
         }
 
-        .stat-label {
-            font-size: 0.9rem;
-            color: #666;
-        }
-
-        .source-preview {
-            background: white;
-            border-radius: 8px;
-            padding: 1rem;
-            margin: 0.5rem 0;
-            border-left: 4px solid #8b4513;
-        }
-
-        .source-title {
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-        }
-
-        .source-meta {
-            font-size: 0.9rem;
-            color: #666;
-            margin-bottom: 0.5rem;
-        }
-
-        .download-section {
-            text-align: center;
-            padding: 2rem;
+        .waitlist-section {
             background: linear-gradient(135deg, #8b4513, #d2691e);
             color: white;
-            border-radius: 15px;
-            margin-top: 2rem;
+            padding: 3rem 0;
+            text-align: center;
+            border-radius: 20px;
+            margin: 2rem 0;
         }
 
-        .recent-research {
+        .email-signup {
+            display: flex;
+            max-width: 400px;
+            margin: 2rem auto;
+            gap: 10px;
+        }
+
+        .email-input {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .signup-btn {
+            padding: 12px 20px;
+            background: white;
+            color: #8b4513;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.3s;
+        }
+
+        .signup-btn:hover {
+            transform: scale(1.05);
+        }
+
+        footer {
+            background: #8b4513;
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
             margin-top: 3rem;
         }
 
-        .recent-research h2 {
-            color: #8b4513;
-            margin-bottom: 1rem;
+        @keyframes bounce {
+            0%, 20%, 53%, 80%, 100% { transform: translate3d(0,0,0); }
+            40%, 43% { transform: translate3d(0,-30px,0); }
+            70% { transform: translate3d(0,-15px,0); }
+            90% { transform: translate3d(0,-4px,0); }
         }
 
-        .research-history {
-            display: grid;
-            gap: 1rem;
-        }
-
-        .history-item {
-            background: white;
-            padding: 1rem;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .history-question {
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-        }
-
-        .history-meta {
-            font-size: 0.9rem;
-            color: #666;
+        .bounce {
+            animation: bounce 2s infinite;
         }
 
         @media (max-width: 768px) {
-            .main-container {
-                padding: 0 10px;
-            }
-            
-            .research-card {
-                padding: 1rem;
-            }
-            
-            .input-actions {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .result-stats {
-                flex-direction: column;
-                gap: 1rem;
-            }
+            .hero h1 { font-size: 2rem; }
+            .hero p { font-size: 1.1rem; }
+            .cta-container { flex-direction: column; align-items: center; }
+            .email-signup { flex-direction: column; }
         }
     </style>
 </head>
 <body>
-    <header class="header">
-        <div class="header-content">
-            <div class="logo">
-                <div class="cookie-icon">🍪</div>
-                Cookiejar
-            </div>
-            <div class="user-info">
-                <div class="credits">13 reports remaining</div>
-                <button class="btn btn-secondary" onclick="logout()">Logout</button>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="cookie-icon">🍪</div>
+                    Cookiejar
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#pricing">Pricing</a></li>
+                        <li><a href="#demo">Demo</a></li>
+                        <li><a href="#signup">Early Access</a></li>
+                    </ul>
+                </nav>
             </div>
         </div>
     </header>
 
-    <div class="main-container">
-        <!-- Research Input Section -->
-        <div class="research-card research-input-section" id="input-section">
-            <h1>What would you like to research?</h1>
-            <p>Enter your research question and we'll create a comprehensive, cited report using academic sources.</p>
-            
-            <div class="input-container">
-                <textarea 
-                    class="research-input" 
-                    id="research-question"
-                    placeholder="e.g., 'Impact of social media on teenage mental health' or 'Latest developments in quantum computing applications'"
-                    maxlength="500"
-                ></textarea>
+    <div class="container">
+        <section class="hero">
+            <h1>Your Research Assistant</h1>
+            <p>Turn any research question into a comprehensive, cited academic report in 30 minutes using AI that actually understands scholarly sources.</p>
+            <div class="cta-container">
+                <a href="#signup" class="btn btn-primary">Join Waitlist</a>
+                <a href="#demo" class="btn btn-secondary">See Demo</a>
             </div>
-            
-            <div class="input-actions">
-                <button class="btn btn-primary" id="start-research" onclick="startResearch()">
-                    Generate Research Report
-                </button>
-                <button class="btn btn-secondary" onclick="showExamples()">
-                    See Examples
-                </button>
-            </div>
-        </div>
+        </section>
 
-        <!-- Processing Section -->
-        <div class="research-card processing-section" id="processing-section">
-            <div class="cookie-jar">
-                <div class="jar-fill"></div>
-            </div>
-            
-            <h2>Researching your question...</h2>
-            <p>This usually takes 2-3 minutes</p>
-            
-            <div class="processing-steps">
-                <div class="processing-step" id="step-1">
-                    <div class="step-icon">1</div>
-                    <span>Analyzing your research question</span>
-                </div>
-                <div class="processing-step" id="step-2">
-                    <div class="step-icon">2</div>
-                    <span>Searching academic databases</span>
-                </div>
-                <div class="processing-step" id="step-3">
-                    <div class="step-icon">3</div>
-                    <span>Found 34 relevant sources</span>
-                </div>
-                <div class="processing-step" id="step-4">
-                    <div class="step-icon">4</div>
-                    <span>Synthesizing findings</span>
-                </div>
-                <div class="processing-step" id="step-5">
-                    <div class="step-icon">5</div>
-                    <span>Generating citations</span>
-                </div>
-                <div class="processing-step" id="step-6">
-                    <div class="step-icon">6</div>
-                    <span>Creating PDF report</span>
+        <section id="demo" class="demo-section">
+            <h2>Try It Out</h2>
+            <div class="demo-container">
+                <input type="text" class="research-input" placeholder="Enter your research question (e.g., 'Impact of social media on mental health')" id="research-question">
+                <br>
+                <button class="btn btn-primary" onclick="simulateResearch()">Generate Research Report</button>
+                <div id="demo-result" style="margin-top: 2rem; display: none;">
+                    <p>🔍 Searching academic databases...</p>
+                    <p>📚 Found 47 relevant sources from PubMed, arXiv, and Google Scholar</p>
+                    <p>🤖 Synthesizing findings...</p>
+                    <p>📄 Generating cited PDF report...</p>
+                    <p>✅ <strong>Research complete!</strong> 12-page report with 47 citations ready for download.</p>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <!-- Results Section -->
-        <div class="research-card results-section" id="results-section">
-            <div class="result-header">
-                <div class="result-title" id="result-title">Research Complete!</div>
-                <div class="result-meta">Generated 2 minutes ago</div>
+        <section id="features" class="features">
+            <div class="feature-card">
+                <div class="feature-icon">🎓</div>
+                <h3>Academic Sources</h3>
+                <p>Access PubMed, arXiv, Google Scholar, JSTOR, and more. Get research from the sources that matter.</p>
             </div>
-            
-            <div class="result-stats">
-                <div class="stat">
-                    <div class="stat-number" id="source-count">34</div>
-                    <div class="stat-label">Sources Found</div>
+            <div class="feature-card">
+                <div class="feature-icon">🤖</div>
+                <h3>AI Synthesis</h3>
+                <p>Advanced AI reads hundreds of papers and synthesizes findings into clear, understandable reports.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📝</div>
+                <h3>Perfect Citations</h3>
+                <p>Automatically formatted APA citations with source credibility scoring and bias detection.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3>30-Minute Reports</h3>
+                <p>What used to take weeks of manual research now takes 30 minutes. Focus on analysis, not data gathering.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔍</div>
+                <h3>Quality Control</h3>
+                <p>Source credibility analysis, bias detection, and research gap identification built in.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>Professional Output</h3>
+                <p>Clean PDF reports ready for submission, with charts, tables, and executive summaries.</p>
+            </div>
+        </section>
+
+        <section id="pricing" class="pricing">
+            <h2>Simple, Student-Friendly Pricing</h2>
+            <div class="pricing-cards">
+                <div class="pricing-card">
+                    <h3>Free</h3>
+                    <div class="price">$0</div>
+                    <ul style="text-align: left; margin: 1rem 0;">
+                        <li>✅ 2 research reports (lifetime)</li>
+                        <li>✅ Basic academic sources</li>
+                        <li>✅ APA citations</li>
+                        <li>❌ Watermarked PDFs</li>
+                    </ul>
+                    <button class="btn btn-secondary">Try Free</button>
                 </div>
-                <div class="stat">
-                    <div class="stat-number" id="page-count">12</div>
-                    <div class="stat-label">Pages Generated</div>
+                <div class="pricing-card featured">
+                    <h3>Student</h3>
+                    <div class="price">$9<span style="font-size: 1rem;">/month</span></div>
+                    <ul style="text-align: left; margin: 1rem 0;">
+                        <li>✅ 15 research reports monthly</li>
+                        <li>✅ All academic sources</li>
+                        <li>✅ Clean PDFs with export</li>
+                        <li>✅ Priority processing</li>
+                        <li>✅ Email support</li>
+                    </ul>
+                    <button class="btn btn-primary">Most Popular</button>
                 </div>
-                <div class="stat">
-                    <div class="stat-number" id="citation-count">28</div>
-                    <div class="stat-label">Citations</div>
+                <div class="pricing-card">
+                    <h3>Researcher</h3>
+                    <div class="price">$19<span style="font-size: 1rem;">/month</span></div>
+                    <ul style="text-align: left; margin: 1rem 0;">
+                        <li>✅ Unlimited reports</li>
+                        <li>✅ Advanced bias detection</li>
+                        <li>✅ Multiple citation formats</li>
+                        <li>✅ Research alerts</li>
+                        <li>✅ Priority support</li>
+                    </ul>
+                    <button class="btn btn-secondary">Coming Soon</button>
                 </div>
             </div>
+        </section>
 
-            <h3>Key Sources Found:</h3>
-            <div id="sources-preview">
-                <!-- Sources will be populated by JavaScript -->
-            </div>
-
-            <div class="download-section">
-                <h3>Your Research Report is Ready!</h3>
-                <p>Professional PDF with citations, executive summary, and methodology</p>
-                <div style="margin-top: 1rem;">
-                    <button class="btn" style="background: white; color: #8b4513; margin-right: 1rem;">
-                        📄 Download PDF
-                    </button>
-                    <button class="btn" style="background: transparent; border: 2px solid white; color: white;">
-                        📧 Email Report
-                    </button>
-                </div>
-            </div>
-
-            <button class="btn btn-secondary" onclick="startNewResearch()" style="margin-top: 1rem;">
-                Start New Research
-            </button>
-        </div>
-
-        <!-- Recent Research -->
-        <div class="recent-research">
-            <h2>Recent Research</h2>
-            <div class="research-history">
-                <div class="history-item">
-                    <div>
-                        <div class="history-question">Impact of remote work on productivity</div>
-                        <div class="history-meta">3 days ago • 15 pages • 42 sources</div>
-                    </div>
-                    <button class="btn btn-secondary">Download</button>
-                </div>
-                <div class="history-item">
-                    <div>
-                        <div class="history-question">Climate change effects on agriculture</div>
-                        <div class="history-meta">1 week ago • 18 pages • 56 sources</div>
-                    </div>
-                    <button class="btn btn-secondary">Download</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        let currentStep = 0;
-        const steps = [
-            'Analyzing your research question',
-            'Searching academic databases',
-            'Found 34 relevant sources',
-            'Synthesizing findings', 
-            'Generating citations',
-            'Creating PDF report'
-        ];
-
-        function startResearch() {
-            const question = document.getElementById('research-question').value.trim();
-            if (!question) {
-                alert('Please enter a research question');
-                return;
-            }
-
-            // Hide input section, show processing
-            document.getElementById('input-section').style.display = 'none';
-            document.getElementById('processing-section').style.display = 'block';
-            
-            // Start processing animation
-            simulateProcessing();
-        }
-
-        function simulateProcessing() {
-            currentStep = 0;
-            const stepElements = document.querySelectorAll('.processing-step');
-            
-            // Reset all steps
-            stepElements.forEach(step => {
-                step.classList.remove('active', 'completed');
-            });
-
-            // Animate through steps
-            const interval = setInterval(() => {
-                if (currentStep > 0) {
-                    stepElements[currentStep - 1].classList.remove('active');
-                    stepElements[currentStep - 1].classList.add('completed');
-                }
-                
-                if (currentStep < steps.length) {
-                    stepElements[currentStep].classList.add('active');
-                    currentStep++;
-                } else {
-                    clearInterval(interval);
-                    setTimeout(showResults, 1000);
-                }
-            }, 2000);
-        }
-
-        function showResults() {
-            document.getElementById('processing-section').style.display = 'none';
-            document.getElementById('results-section').style.display = 'block';
-            
-            // Populate sample sources
-            const sourcesPreview = document.getElementById('sources-preview');
-            const sampleSources = [
-                {
-                    title: 'The Impact of Social Media on Mental Health: A Systematic Review',
-                    authors: 'Smith, J., Johnson, A., Brown, M.',
-                    journal: 'Journal of Behavioral Health, 2023',
-                    snippet: 'This comprehensive review examines 45 studies on social media usage patterns...'
-                },
-                {
-                    title: 'Digital Well-being and Adolescent Development', 
-                    authors: 'Wilson, K., Davis, R.',
-                    journal: 'Child Psychology Review, 2023',
-                    snippet: 'Recent longitudinal data suggests significant correlations between...'
-                },
-                {
-                    title: 'Social Network Usage and Depression Rates: A Meta-Analysis',
-                    authors: 'Lee, S., Garcia, M., Thompson, P.',
-                    journal: 'Clinical Psychology Today, 2022',
-                    snippet: 'Analysis of 78 peer-reviewed studies reveals consistent patterns...'
-                }
-            ];
-
-            sourcesPreview.innerHTML = sampleSources.map(source => `
-                <div class="source-preview">
-                    <div class="source-title">${source.title}</div>
-                    <div class="source-meta">${source.authors} | ${source.journal}</div>
-                    <div style="font-size: 0.9rem; margin-top: 0.5rem;">${source.snippet}</div>
-                </div>
-            `).join('');
-        }
-
-        function startNewResearch() {
-            document.getElementById('results-section').style.display = 'none';
-            document.getElementById('input-section').style.display = 'block';
-            document.getElementById('research-question').value = '';
-            document.getElementById('research-question').focus();
-        }
-
-        function showExamples() {
-            const examples = [
-                'Impact of artificial intelligence on job displacement',
-                'Effectiveness of meditation on anxiety reduction',
-                'Climate change effects on coral reef ecosystems',
-                'Blockchain technology applications in healthcare',
-                'Remote learning effectiveness during COVID-19'
-            ];
-            
-            const randomExample = examples[Math.floor(Math.random() * examples.length)];
-            document.getElementById('research-question').value = randomExample;
-        }
-
-        function logout() {
-            // In real app, this would clear authentication
-            window.location.href = 'index.html';
-        }
-
-        // Auto-resize textarea
-        document.getElementById('research-question').addEventListener('input', function() {
-            this.style.height = 'auto';
-            this.style.height = Math.max(80, this.scrollHeight) + 'px';
-        });
-    </script>
-</body>
-</html>
+        <section id="signup" class="waitlist-section">
+            <h2>Get Early Access</h2>
+            <p>Join
