@@ -89,10 +89,6 @@
             font-size: 3rem;
             margin-bottom: 1rem;
             color: #8b4513;
-            background: linear-gradient(45deg, #8b4513, #d2691e);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
         }
 
         .hero p {
@@ -239,36 +235,6 @@
             margin: 2rem 0;
         }
 
-        .email-signup {
-            display: flex;
-            max-width: 400px;
-            margin: 2rem auto;
-            gap: 10px;
-        }
-
-        .email-input {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-        }
-
-        .signup-btn {
-            padding: 12px 20px;
-            background: white;
-            color: #8b4513;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: transform 0.3s;
-        }
-
-        .signup-btn:hover {
-            transform: scale(1.05);
-        }
-
         footer {
             background: #8b4513;
             color: white;
@@ -277,22 +243,10 @@
             margin-top: 3rem;
         }
 
-        @keyframes bounce {
-            0%, 20%, 53%, 80%, 100% { transform: translate3d(0,0,0); }
-            40%, 43% { transform: translate3d(0,-30px,0); }
-            70% { transform: translate3d(0,-15px,0); }
-            90% { transform: translate3d(0,-4px,0); }
-        }
-
-        .bounce {
-            animation: bounce 2s infinite;
-        }
-
         @media (max-width: 768px) {
             .hero h1 { font-size: 2rem; }
             .hero p { font-size: 1.1rem; }
             .cta-container { flex-direction: column; align-items: center; }
-            .email-signup { flex-direction: column; }
         }
     </style>
 </head>
@@ -319,9 +273,9 @@
     <div class="container">
         <section class="hero">
             <h1>Your Research Assistant</h1>
-            <p>Turn any research question into a comprehensive, cited academic report in 30 minutes using AI that actually understands scholarly sources.</p>
+            <p>Turn any research question into a comprehensive, cited report in 30 minutes. Real academic sources, perfect citations, professional formatting.</p>
             <div class="cta-container">
-                <a href="#signup" class="btn btn-primary">Join Waitlist</a>
+                <a href="app.html" class="btn btn-primary">Try It Now</a>
                 <a href="#demo" class="btn btn-secondary">See Demo</a>
             </div>
         </section>
@@ -331,14 +285,7 @@
             <div class="demo-container">
                 <input type="text" class="research-input" placeholder="Enter your research question (e.g., 'Impact of social media on mental health')" id="research-question">
                 <br>
-                <button class="btn btn-primary" onclick="simulateResearch()">Generate Research Report</button>
-                <div id="demo-result" style="margin-top: 2rem; display: none;">
-                    <p>🔍 Searching academic databases...</p>
-                    <p>📚 Found 47 relevant sources from PubMed, arXiv, and Google Scholar</p>
-                    <p>🤖 Synthesizing findings...</p>
-                    <p>📄 Generating cited PDF report...</p>
-                    <p>✅ <strong>Research complete!</strong> 12-page report with 47 citations ready for download.</p>
-                </div>
+                <button class="btn btn-primary" onclick="window.location.href='app.html'">Generate Research Report</button>
             </div>
         </section>
 
@@ -350,8 +297,8 @@
             </div>
             <div class="feature-card">
                 <div class="feature-icon">🤖</div>
-                <h3>AI Synthesis</h3>
-                <p>Advanced AI reads hundreds of papers and synthesizes findings into clear, understandable reports.</p>
+                <h3>Intelligent Synthesis</h3>
+                <p>Advanced algorithms read hundreds of papers and synthesize findings into clear, understandable reports.</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">📝</div>
@@ -387,7 +334,7 @@
                         <li>✅ APA citations</li>
                         <li>❌ Watermarked PDFs</li>
                     </ul>
-                    <button class="btn btn-secondary">Try Free</button>
+                    <button class="btn btn-secondary" onclick="window.location.href='app.html'">Try Free</button>
                 </div>
                 <div class="pricing-card featured">
                     <h3>Student</h3>
@@ -399,7 +346,7 @@
                         <li>✅ Priority processing</li>
                         <li>✅ Email support</li>
                     </ul>
-                    <button class="btn btn-primary">Most Popular</button>
+                    <button class="btn btn-primary" onclick="window.location.href='app.html'">Get Started</button>
                 </div>
                 <div class="pricing-card">
                     <h3>Researcher</h3>
@@ -411,11 +358,26 @@
                         <li>✅ Research alerts</li>
                         <li>✅ Priority support</li>
                     </ul>
-                    <button class="btn btn-secondary">Coming Soon</button>
+                    <button class="btn btn-secondary" onclick="window.location.href='app.html'">Coming Soon</button>
                 </div>
             </div>
         </section>
 
         <section id="signup" class="waitlist-section">
-            <h2>Get Early Access</h2>
-            <p>Join
+            <h2>Ready to Transform Your Research?</h2>
+            <p>Join thousands of researchers who've already discovered the future of academic research.</p>
+            <div style="margin-top: 2rem;">
+                <a href="app.html" class="btn" style="background: white; color: #8b4513; padding: 15px 40px; font-size: 1.2rem;">
+                    🍪 Start Researching Now
+                </a>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Cookiejar. Making research delicious. 🍪</p>
+        </div>
+    </footer>
+</body>
+</html>
