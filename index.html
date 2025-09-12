@@ -76,6 +76,11 @@
             color: #f4a460;
         }
 
+        .auth-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
         .hero {
             text-align: center;
             padding: 4rem 0;
@@ -139,6 +144,130 @@
         .btn-secondary:hover {
             background: #8b4513;
             color: white;
+        }
+
+        .btn-small {
+            padding: 8px 20px;
+            font-size: 0.9rem;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Auth Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .modal-header h2 {
+            color: #8b4513;
+            margin-bottom: 0.5rem;
+        }
+
+        .close {
+            position: absolute;
+            right: 1rem;
+            top: 1rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .close:hover {
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #8b4513;
+        }
+
+        .auth-toggle {
+            text-align: center;
+            margin-top: 1rem;
+            color: #666;
+        }
+
+        .auth-toggle a {
+            color: #8b4513;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .auth-toggle a:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c33;
+            padding: 0.5rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .success-message {
+            background: #efe;
+            color: #393;
+            padding: 0.5rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
         }
 
         .demo-section {
@@ -247,6 +376,7 @@
             .hero h1 { font-size: 2rem; }
             .hero p { font-size: 1.1rem; }
             .cta-container { flex-direction: column; align-items: center; }
+            .auth-buttons { flex-direction: column; }
         }
     </style>
 </head>
@@ -263,19 +393,57 @@
                         <li><a href="#features">Features</a></li>
                         <li><a href="#pricing">Pricing</a></li>
                         <li><a href="#demo">Demo</a></li>
-                        <li><a href="#signup">Early Access</a></li>
                     </ul>
                 </nav>
+                <div class="auth-buttons">
+                    <button class="btn btn-secondary btn-small" onclick="showLogin()">Login</button>
+                    <button class="btn btn-primary btn-small" onclick="showSignup()">Sign Up</button>
+                </div>
             </div>
         </div>
     </header>
+
+    <!-- Auth Modal -->
+    <div id="authModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div class="modal-header">
+                <h2 id="modalTitle">Sign Up for Cookiejar</h2>
+                <p id="modalSubtitle">Start your research journey today</p>
+            </div>
+            
+            <div id="errorMessage" class="error-message" style="display: none;"></div>
+            <div id="successMessage" class="success-message" style="display: none;"></div>
+            
+            <form id="authForm">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary" style="width: 100%;" id="authButton">
+                        Create Account
+                    </button>
+                </div>
+            </form>
+            
+            <div class="auth-toggle">
+                <span id="toggleText">Already have an account?</span>
+                <a href="#" id="toggleLink" onclick="toggleAuthMode()">Login</a>
+            </div>
+        </div>
+    </div>
 
     <div class="container">
         <section class="hero">
             <h1>Your Research Assistant</h1>
             <p>Turn any research question into a comprehensive, cited report in 30 minutes. Real academic sources, perfect citations, professional formatting.</p>
             <div class="cta-container">
-                <a href="app.html" class="btn btn-primary">Try It Now</a>
+                <button class="btn btn-primary" onclick="showSignup()">Get Started Free</button>
                 <a href="#demo" class="btn btn-secondary">See Demo</a>
             </div>
         </section>
@@ -285,7 +453,8 @@
             <div class="demo-container">
                 <input type="text" class="research-input" placeholder="Enter your research question (e.g., 'Impact of social media on mental health')" id="research-question">
                 <br>
-                <button class="btn btn-primary" onclick="window.location.href='app.html'">Generate Research Report</button>
+                <button class="btn btn-primary" onclick="showSignup()">Generate Research Report</button>
+                <p style="margin-top: 1rem; color: #666; font-size: 0.9rem;">Create a free account to start researching</p>
             </div>
         </section>
 
@@ -334,7 +503,7 @@
                         <li>✅ APA citations</li>
                         <li>❌ Watermarked PDFs</li>
                     </ul>
-                    <button class="btn btn-secondary" onclick="window.location.href='app.html'">Try Free</button>
+                    <button class="btn btn-secondary" onclick="showSignup()">Try Free</button>
                 </div>
                 <div class="pricing-card featured">
                     <h3>Student</h3>
@@ -346,7 +515,7 @@
                         <li>✅ Priority processing</li>
                         <li>✅ Email support</li>
                     </ul>
-                    <button class="btn btn-primary" onclick="window.location.href='app.html'">Get Started</button>
+                    <button class="btn btn-primary" onclick="showSignup()">Get Started</button>
                 </div>
                 <div class="pricing-card">
                     <h3>Researcher</h3>
@@ -358,7 +527,7 @@
                         <li>✅ Research alerts</li>
                         <li>✅ Priority support</li>
                     </ul>
-                    <button class="btn btn-secondary" onclick="window.location.href='app.html'">Coming Soon</button>
+                    <button class="btn btn-secondary" onclick="showSignup()">Coming Soon</button>
                 </div>
             </div>
         </section>
@@ -367,9 +536,9 @@
             <h2>Ready to Transform Your Research?</h2>
             <p>Join thousands of researchers who've already discovered the future of academic research.</p>
             <div style="margin-top: 2rem;">
-                <a href="app.html" class="btn" style="background: white; color: #8b4513; padding: 15px 40px; font-size: 1.2rem;">
+                <button class="btn" style="background: white; color: #8b4513; padding: 15px 40px; font-size: 1.2rem;" onclick="showSignup()">
                     🍪 Start Researching Now
-                </a>
+                </button>
             </div>
         </section>
     </div>
@@ -379,5 +548,223 @@
             <p>&copy; 2024 Cookiejar. Making research delicious. 🍪</p>
         </div>
     </footer>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+
+        // Your Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBoP3cMo1gFGx2LVqFtVyDLQvaedqHmf4E",
+            authDomain: "cookiejar-b639e.firebaseapp.com",
+            projectId: "cookiejar-b639e",
+            storageBucket: "cookiejar-b639e.firebasestorage.app",
+            messagingSenderId: "1062366176100",
+            appId: "1:1062366176100:web:a0f584bc58746dddcb1071",
+            measurementId: "G-XBRZR7KS0R"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // Make auth available globally
+        window.auth = auth;
+        window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
+        window.signInWithEmailAndPassword = signInWithEmailAndPassword;
+
+        // Check if user is already logged in
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                console.log('User is signed in:', user.email);
+                // Could redirect to app.html here if needed
+            } else {
+                console.log('User is signed out');
+            }
+        });
+    </script>
+
+    <script>
+        let isLoginMode = false;
+        let isLoading = false;
+
+        function showModal() {
+            document.getElementById('authModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('authModal').style.display = 'none';
+            clearMessages();
+            resetForm();
+        }
+
+        function showLogin() {
+            isLoginMode = true;
+            updateModalContent();
+            showModal();
+        }
+
+        function showSignup() {
+            isLoginMode = false;
+            updateModalContent();
+            showModal();
+        }
+
+        function updateModalContent() {
+            const title = document.getElementById('modalTitle');
+            const subtitle = document.getElementById('modalSubtitle');
+            const button = document.getElementById('authButton');
+            const toggleText = document.getElementById('toggleText');
+            const toggleLink = document.getElementById('toggleLink');
+
+            if (isLoginMode) {
+                title.textContent = 'Welcome Back';
+                subtitle.textContent = 'Login to your Cookiejar account';
+                button.textContent = 'Login';
+                toggleText.textContent = "Don't have an account?";
+                toggleLink.textContent = 'Sign Up';
+            } else {
+                title.textContent = 'Sign Up for Cookiejar';
+                subtitle.textContent = 'Start your research journey today';
+                button.textContent = 'Create Account';
+                toggleText.textContent = 'Already have an account?';
+                toggleLink.textContent = 'Login';
+            }
+        }
+
+        function toggleAuthMode() {
+            isLoginMode = !isLoginMode;
+            updateModalContent();
+            clearMessages();
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            document.getElementById('successMessage').style.display = 'none';
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.getElementById('successMessage');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+            document.getElementById('errorMessage').style.display = 'none';
+        }
+
+        function clearMessages() {
+            document.getElementById('errorMessage').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'none';
+        }
+
+        function resetForm() {
+            document.getElementById('email').value = '';
+            document.getElementById('password').value = '';
+            isLoading = false;
+            updateButtonState();
+        }
+
+        function updateButtonState() {
+            const button = document.getElementById('authButton');
+            const form = document.getElementById('authForm');
+            
+            if (isLoading) {
+                button.disabled = true;
+                button.textContent = isLoginMode ? 'Logging in...' : 'Creating Account...';
+                form.classList.add('loading');
+            } else {
+                button.disabled = false;
+                button.textContent = isLoginMode ? 'Login' : 'Create Account';
+                form.classList.remove('loading');
+            }
+        }
+
+        function getFirebaseErrorMessage(error) {
+            switch (error.code) {
+                case 'auth/email-already-in-use':
+                    return 'An account with this email already exists. Try logging in instead.';
+                case 'auth/weak-password':
+                    return 'Password is too weak. Please use at least 6 characters.';
+                case 'auth/invalid-email':
+                    return 'Please enter a valid email address.';
+                case 'auth/user-not-found':
+                    return 'No account found with this email. Please sign up first.';
+                case 'auth/wrong-password':
+                    return 'Incorrect password. Please try again.';
+                case 'auth/too-many-requests':
+                    return 'Too many failed attempts. Please try again later.';
+                default:
+                    return 'An error occurred. Please try again.';
+            }
+        }
+
+        // Handle form submission
+        document.getElementById('authForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (isLoading) return;
+            
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+
+            // Basic validation
+            if (!email || !password) {
+                showError('Please fill in all fields');
+                return;
+            }
+
+            if (password.length < 6) {
+                showError('Password must be at least 6 characters');
+                return;
+            }
+
+            // Start loading state
+            isLoading = true;
+            updateButtonState();
+            clearMessages();
+
+            try {
+                if (isLoginMode) {
+                    // Login user
+                    const userCredential = await window.signInWithEmailAndPassword(window.auth, email, password);
+                    console.log('User logged in:', userCredential.user.email);
+                    showSuccess('Login successful! Redirecting...');
+                } else {
+                    // Create new user
+                    const userCredential = await window.createUserWithEmailAndPassword(window.auth, email, password);
+                    console.log('User created:', userCredential.user.email);
+                    showSuccess('Account created successfully! Redirecting...');
+                }
+
+                // Redirect to app after successful auth
+                setTimeout(() => {
+                    window.location.href = 'app.html';
+                }, 1500);
+
+            } catch (error) {
+                console.error('Auth error:', error);
+                showError(getFirebaseErrorMessage(error));
+            } finally {
+                isLoading = false;
+                updateButtonState();
+            }
+        });
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('authModal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+
+        // Close modal on escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
 </body>
 </html>
