@@ -62,11 +62,41 @@
             gap: 1rem;
         }
 
+        .user-email {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
         .credits {
             background: rgba(255,255,255,0.2);
             padding: 0.5rem 1rem;
             border-radius: 20px;
             font-size: 0.9rem;
+        }
+
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #f5e6d3 0%, #e8d5c4 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .loading-cookie {
+            font-size: 4rem;
+            animation: loadingBounce 1s infinite ease-in-out;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes loadingBounce {
+            0%, 100% { transform: translateY(0px) scale(1); }
+            50% { transform: translateY(-10px) scale(1.05); }
         }
 
         .main-container {
@@ -404,20 +434,28 @@
     </style>
 </head>
 <body>
-    <header class="header">
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-cookie">🍪</div>
+        <h2 style="color: #8b4513;">Loading Cookiejar...</h2>
+        <p style="color: #666; margin-top: 0.5rem;">Checking authentication</p>
+    </div>
+
+    <header class="header" id="mainHeader" style="display: none;">
         <div class="header-content">
             <div class="logo">
                 <div class="cookie-icon">🍪</div>
                 Cookiejar
             </div>
             <div class="user-info">
+                <div class="user-email" id="userEmail">user@example.com</div>
                 <div class="credits">13 reports remaining</div>
                 <button class="btn btn-secondary" onclick="logout()">Logout</button>
             </div>
         </div>
     </header>
 
-    <div class="main-container">
+    <div class="main-container" id="mainContent" style="display: none;">
         <!-- Research Input Section -->
         <div class="research-card research-input-section" id="input-section">
             <h1>What would you like to research?</h1>
@@ -545,6 +583,65 @@
             </div>
         </div>
     </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+
+        // Your Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBoP3cMo1gFGx2LVqFtVyDLQvaedqHmf4E",
+            authDomain: "cookiejar-b639e.firebaseapp.com",
+            projectId: "cookiejar-b639e",
+            storageBucket: "cookiejar-b639e.firebasestorage.app",
+            messagingSenderId: "1062366176100",
+            appId: "1:1062366176100:web:a0f584bc58746dddcb1071",
+            measurementId: "G-XBRZR7KS0R"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // Make functions available globally
+        window.logout = async function() {
+            try {
+                await signOut(auth);
+                window.location.href = 'index.html';
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+        };
+
+        // Check authentication state
+        onAuthStateChanged(auth, (user) => {
+            const loadingScreen = document.getElementById('loadingScreen');
+            const mainHeader = document.getElementById('mainHeader');
+            const mainContent = document.getElementById('mainContent');
+            const userEmail = document.getElementById('userEmail');
+
+            if (user) {
+                // User is signed in
+                console.log('User is authenticated:', user.email);
+                
+                // Update UI with user info
+                if (userEmail) {
+                    userEmail.textContent = user.email;
+                }
+                
+                // Show main app
+                loadingScreen.style.display = 'none';
+                mainHeader.style.display = 'block';
+                mainContent.style.display = 'block';
+                
+            } else {
+                // User is not signed in, redirect to login
+                console.log('User not authenticated, redirecting to login');
+                window.location.href = 'index.html';
+            }
+        });
+    </script>
 
     <script>
         let currentStep = 0;
@@ -735,10 +832,6 @@
             
             const randomExample = examples[Math.floor(Math.random() * examples.length)];
             document.getElementById('research-question').value = randomExample;
-        }
-
-        function logout() {
-            window.location.href = 'index.html';
         }
 
         // Auto-resize textarea
