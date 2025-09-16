@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cookiejar - Your Research Operating System</title>
+    <title>Cookiejar Research App</title>
     <style>
         * {
             margin: 0;
@@ -56,16 +56,116 @@
             font-size: 18px;
         }
 
-        .nav-buttons {
+        .user-info {
             display: flex;
+            align-items: center;
             gap: 1rem;
         }
 
+        .user-email {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .credits {
+            background: rgba(255,255,255,0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #f5e6d3 0%, #e8d5c4 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .loading-cookie {
+            font-size: 4rem;
+            animation: loadingBounce 1s infinite ease-in-out;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes loadingBounce {
+            0%, 100% { transform: translateY(0px) scale(1); }
+            50% { transform: translateY(-10px) scale(1.05); }
+        }
+
+        .main-container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 20px;
+        }
+
+        .research-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .research-input-section {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .research-input-section h1 {
+            color: #8b4513;
+            margin-bottom: 1rem;
+            font-size: 2rem;
+        }
+
+        .research-input-section p {
+            color: #666;
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+
+        .input-container {
+            position: relative;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .research-input {
+            width: 100%;
+            padding: 20px;
+            border: 2px solid #ddd;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            resize: vertical;
+            min-height: 80px;
+            transition: all 0.3s;
+        }
+
+        .research-input:focus {
+            outline: none;
+            border-color: #8b4513;
+            box-shadow: 0 0 20px rgba(139, 69, 19, 0.2);
+        }
+
+        .input-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
         .btn {
-            padding: 10px 25px;
+            padding: 12px 30px;
             border: none;
             border-radius: 25px;
-            font-size: 0.95rem;
+            font-size: 1rem;
             cursor: pointer;
             transition: all 0.3s;
             font-weight: 600;
@@ -79,327 +179,379 @@
             box-shadow: 0 4px 15px rgba(139, 69, 19, 0.3);
         }
 
-        .btn-primary:hover {
+        .btn-primary:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(139, 69, 19, 0.4);
         }
 
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
         .btn-secondary {
             background: transparent;
-            color: white;
-            border: 2px solid white;
+            color: #8b4513;
+            border: 2px solid #8b4513;
         }
 
         .btn-secondary:hover {
-            background: white;
-            color: #8b4513;
+            background: #8b4513;
+            color: white;
         }
 
-        .hero {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 4rem 20px;
-            text-align: center;
-        }
-
-        .hero h1 {
-            font-size: 3.5rem;
-            margin-bottom: 1rem;
-            color: #8b4513;
-            font-weight: 700;
-        }
-
-        .hero p {
-            font-size: 1.3rem;
-            margin-bottom: 2rem;
-            color: #666;
-            max-width: 700px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .cta-container {
-            display: flex;
-            gap: 1.5rem;
-            justify-content: center;
-            margin-bottom: 3rem;
-            flex-wrap: wrap;
-        }
-
-        .hero .btn {
-            font-size: 1.1rem;
-            padding: 15px 35px;
-        }
-
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-top: 4rem;
-        }
-
-        .feature {
-            background: white;
-            padding: 2rem;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            text-align: center;
-            transition: transform 0.3s;
-        }
-
-        .feature:hover {
-            transform: translateY(-5px);
-        }
-
-        .feature-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-        }
-
-        .feature h3 {
-            color: #8b4513;
-            margin-bottom: 1rem;
-            font-size: 1.3rem;
-        }
-
-        .auth-modal {
+        .processing-section {
             display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.7);
-            z-index: 1000;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .cookie-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 2rem;
+            display: flex;
+            align-items: center;
             justify-content: center;
+        }
+
+        .cookie {
+            font-size: 8rem;
+            animation: cookieBounce 2s infinite ease-in-out;
+            filter: drop-shadow(0 8px 16px rgba(0,0,0,0.2));
+            user-select: none;
+        }
+
+        @keyframes cookieBounce {
+            0%, 100% { transform: translateY(0px) scale(1); }
+            50% { transform: translateY(-15px) scale(1.05); }
+        }
+
+        .crumb {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #8b4513;
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        .crumb.falling {
+            animation: crumbFall 2s ease-out forwards;
+        }
+
+        @keyframes crumbFall {
+            0% { 
+                opacity: 1; 
+                transform: scale(1) translateY(0px);
+            }
+            100% { 
+                opacity: 0; 
+                transform: scale(0.3) translateY(100px) rotate(360deg);
+            }
+        }
+
+        .processing-steps {
+            text-align: left;
+            max-width: 400px;
+            margin: 2rem auto 0;
+        }
+
+        .processing-step {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem 0;
+            opacity: 0.3;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .processing-step.active {
+            opacity: 1;
+        }
+
+        .processing-step.completed {
+            opacity: 0.7;
+        }
+
+        .step-icon {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .processing-step.active .step-icon {
+            background: #8b4513;
+            color: white;
+            animation: pulse 1.5s infinite;
+        }
+
+        .processing-step.completed .step-icon {
+            background: #28a745;
+            color: white;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .results-section {
+            display: none;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .result-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #8b4513;
+        }
+
+        .result-stats {
+            display: flex;
+            gap: 2rem;
+            margin: 1rem 0;
+            text-align: center;
+        }
+
+        .stat {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 10px;
+            flex: 1;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #8b4513;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .source-preview {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            border-left: 4px solid #8b4513;
+        }
+
+        .source-title {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .source-meta {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+
+        .download-section {
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, #8b4513, #d2691e);
+            color: white;
+            border-radius: 15px;
+            margin-top: 2rem;
+        }
+
+        .recent-research {
+            margin-top: 3rem;
+        }
+
+        .recent-research h2 {
+            color: #8b4513;
+            margin-bottom: 1rem;
+        }
+
+        .research-history {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .history-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
             align-items: center;
         }
 
-        .auth-content {
-            background: white;
-            padding: 3rem;
-            border-radius: 20px;
-            max-width: 400px;
-            width: 90%;
-            position: relative;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-        }
-
-        .close-btn {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: #666;
-        }
-
-        .auth-header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .auth-header h2 {
-            color: #8b4513;
+        .history-question {
+            font-weight: bold;
             margin-bottom: 0.5rem;
         }
 
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: #333;
-            font-weight: 500;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: border-color 0.3s;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: #8b4513;
-        }
-
-        .auth-submit {
-            width: 100%;
-            margin-bottom: 1rem;
-        }
-
-        .auth-switch {
-            text-align: center;
+        .history-meta {
+            font-size: 0.9rem;
             color: #666;
         }
 
-        .auth-switch a {
-            color: #8b4513;
-            text-decoration: none;
-            font-weight: 600;
+        .error {
+            background: #ffe6e6;
+            border: 1px solid #ff9999;
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 1rem 0;
+            color: #cc0000;
         }
 
-        .auth-switch a:hover {
-            text-decoration: underline;
-        }
-
-        .error-message {
-            color: #dc3545;
-            font-size: 0.9rem;
-            margin-top: 0.5rem;
-            display: none;
-        }
-
-        .success-message {
-            color: #28a745;
-            font-size: 0.9rem;
-            margin-top: 0.5rem;
-            display: none;
+        .error h3 {
+            margin-bottom: 0.5rem;
         }
 
         @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 2.5rem;
+            .main-container {
+                padding: 0 10px;
             }
-
-            .hero p {
-                font-size: 1.1rem;
+            
+            .research-card {
+                padding: 1rem;
             }
-
-            .features {
-                grid-template-columns: 1fr;
-            }
-
-            .cta-container {
+            
+            .input-actions {
                 flex-direction: column;
                 align-items: center;
             }
-
-            .nav-buttons {
+            
+            .result-stats {
                 flex-direction: column;
-                gap: 0.5rem;
+                gap: 1rem;
+            }
+            
+            .cookie {
+                font-size: 6rem;
             }
         }
     </style>
 </head>
 <body>
-    <header class="header">
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-cookie">🍪</div>
+        <h2 style="color: #8b4513;">Loading Cookiejar...</h2>
+        <p style="color: #666; margin-top: 0.5rem;">Checking authentication</p>
+    </div>
+
+    <header class="header" id="mainHeader" style="display: none;">
         <div class="header-content">
             <div class="logo">
                 <div class="cookie-icon">🍪</div>
                 Cookiejar
             </div>
-            <div class="nav-buttons">
-                <button class="btn btn-secondary" onclick="showAuth('login')">Login</button>
-                <button class="btn btn-primary" onclick="showAuth('signup')">Sign Up</button>
+            <div class="user-info">
+                <div class="user-email" id="userEmail">user@example.com</div>
+                <div class="credits">13 reports remaining</div>
+                <button class="btn btn-secondary" onclick="logout()">Logout</button>
             </div>
         </div>
     </header>
 
-    <section class="hero">
-        <h1>Your Research Operating System</h1>
-        <p>Get reliable, understandable answers to any question. Break down language barriers, time periods, and academic gatekeeping.</p>
-        
-        <div class="cta-container">
-            <button class="btn btn-primary" onclick="showAuth('signup')">Start Researching</button>
-            <a href="#features" class="btn btn-secondary">Learn More</a>
-        </div>
-
-        <div class="features" id="features">
-            <div class="feature">
-                <div class="feature-icon">🧠</div>
-                <h3>AI-Powered Research</h3>
-                <p>Advanced AI analyzes thousands of sources to create comprehensive, cited reports in minutes.</p>
-            </div>
-            <div class="feature">
-                <div class="feature-icon">📚</div>
-                <h3>Academic Sources</h3>
-                <p>Access PubMed, arXiv, JSTOR, and 100+ academic databases through one simple interface.</p>
-            </div>
-            <div class="feature">
-                <div class="feature-icon">🔍</div>
-                <h3>Research DNA</h3>
-                <p>Unique methodology fingerprinting ensures reproducible, high-quality research every time.</p>
-            </div>
-            <div class="feature">
-                <div class="feature-icon">⏰</div>
-                <h3>Time Machine</h3>
-                <p>Track how understanding evolved over time and predict future research directions.</p>
-            </div>
-            <div class="feature">
-                <div class="feature-icon">🌍</div>
-                <h3>Ancient Texts</h3>
-                <p>Translate and analyze Hebrew, Greek, Latin, and other ancient documents with cultural context.</p>
-            </div>
-            <div class="feature">
-                <div class="feature-icon">✅</div>
-                <h3>Bias Detection</h3>
-                <p>Automatically detect bias, controversy, and conflicting information across sources.</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Authentication Modal -->
-    <div id="authModal" class="auth-modal">
-        <div class="auth-content">
-            <button class="close-btn" onclick="hideAuth()">&times;</button>
+    <div class="main-container" id="mainContent" style="display: none;">
+        <!-- Research Input Section -->
+        <div class="research-card research-input-section" id="input-section">
+            <h1>What would you like to research?</h1>
+            <p>Enter your research question and we'll create a comprehensive, cited report using academic sources.</p>
             
-            <!-- Login Form -->
-            <div id="loginForm">
-                <div class="auth-header">
-                    <h2>Welcome Back</h2>
-                    <p>Sign in to continue your research</p>
+            <div class="input-container">
+                <textarea 
+                    class="research-input" 
+                    id="research-question"
+                    placeholder="e.g., 'Impact of social media on teenage mental health' or 'Latest developments in quantum computing applications'"
+                    maxlength="500"
+                ></textarea>
+            </div>
+            
+            <div class="input-actions">
+                <button class="btn btn-primary" id="start-research" onclick="performResearch()">
+                    Generate Research Report
+                </button>
+                <button class="btn btn-secondary" onclick="showExamples()">
+                    See Examples
+                </button>
+            </div>
+        </div>
+
+        <!-- Processing Section -->
+        <div class="research-card processing-section" id="processing-section">
+            <div class="cookie-container">
+                <div class="cookie" id="cookie">🍪</div>
+            </div>
+            
+            <h2>Researching your question...</h2>
+            <p>Gathering knowledge, one bite at a time 🍪</p>
+            
+            <div class="processing-steps">
+                <div class="processing-step" id="step-1">
+                    <div class="step-icon">1</div>
+                    <span>Analyzing your research question</span>
                 </div>
-                <form onsubmit="handleLogin(event)">
-                    <div class="form-group">
-                        <label for="loginEmail">Email</label>
-                        <input type="email" id="loginEmail" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="loginPassword">Password</label>
-                        <input type="password" id="loginPassword" required>
-                    </div>
-                    <div class="error-message" id="loginError"></div>
-                    <button type="submit" class="btn btn-primary auth-submit">Sign In</button>
-                </form>
-                <div class="auth-switch">
-                    Don't have an account? <a href="#" onclick="switchAuth('signup')">Sign up</a>
+                <div class="processing-step" id="step-2">
+                    <div class="step-icon">2</div>
+                    <span>Searching academic databases</span>
+                </div>
+                <div class="processing-step" id="step-3">
+                    <div class="step-icon">3</div>
+                    <span>Found 34 relevant sources</span>
+                </div>
+                <div class="processing-step" id="step-4">
+                    <div class="step-icon">4</div>
+                    <span>Synthesizing findings</span>
+                </div>
+                <div class="processing-step" id="step-5">
+                    <div class="step-icon">5</div>
+                    <span>Generating citations</span>
+                </div>
+                <div class="processing-step" id="step-6">
+                    <div class="step-icon">6</div>
+                    <span>Creating PDF report</span>
                 </div>
             </div>
+        </div>
 
-            <!-- Signup Form -->
-            <div id="signupForm" style="display: none;">
-                <div class="auth-header">
-                    <h2>Join Cookiejar</h2>
-                    <p>Start your research journey today</p>
+        <!-- Results Section -->
+        <div class="research-card results-section" id="results-section">
+            <div id="results"></div>
+        </div>
+
+        <!-- Recent Research -->
+        <div class="recent-research">
+            <h2>Recent Research</h2>
+            <div class="research-history">
+                <div class="history-item">
+                    <div>
+                        <div class="history-question">Impact of remote work on productivity</div>
+                        <div class="history-meta">3 days ago • 15 pages • 42 sources</div>
+                    </div>
+                    <button class="btn btn-secondary">Download</button>
                 </div>
-                <form onsubmit="handleSignup(event)">
-                    <div class="form-group">
-                        <label for="signupEmail">Email</label>
-                        <input type="email" id="signupEmail" required>
+                <div class="history-item">
+                    <div>
+                        <div class="history-question">Climate change effects on agriculture</div>
+                        <div class="history-meta">1 week ago • 18 pages • 56 sources</div>
                     </div>
-                    <div class="form-group">
-                        <label for="signupPassword">Password</label>
-                        <input type="password" id="signupPassword" required minlength="6">
-                    </div>
-                    <div class="form-group">
-                        <label for="confirmPassword">Confirm Password</label>
-                        <input type="password" id="confirmPassword" required minlength="6">
-                    </div>
-                    <div class="error-message" id="signupError"></div>
-                    <div class="success-message" id="signupSuccess"></div>
-                    <button type="submit" class="btn btn-primary auth-submit">Create Account</button>
-                </form>
-                <div class="auth-switch">
-                    Already have an account? <a href="#" onclick="switchAuth('login')">Sign in</a>
+                    <button class="btn btn-secondary">Download</button>
                 </div>
             </div>
         </div>
@@ -408,7 +560,7 @@
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 
         // Your Firebase configuration
         const firebaseConfig = {
@@ -425,135 +577,260 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
-        // Check if user is already signed in
+        // Make functions available globally
+        window.logout = async function() {
+            try {
+                await signOut(auth);
+                window.location.href = 'index.html';
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+        };
+
+        // Check authentication state
         onAuthStateChanged(auth, (user) => {
+            const loadingScreen = document.getElementById('loadingScreen');
+            const mainHeader = document.getElementById('mainHeader');
+            const mainContent = document.getElementById('mainContent');
+            const userEmail = document.getElementById('userEmail');
+
             if (user) {
-                // User is signed in, redirect to app
-                window.location.href = 'app.html';
+                // User is signed in
+                console.log('User is authenticated:', user.email);
+                
+                // Update UI with user info
+                if (userEmail) {
+                    userEmail.textContent = user.email;
+                }
+                
+                // Show main app
+                loadingScreen.style.display = 'none';
+                mainHeader.style.display = 'block';
+                mainContent.style.display = 'block';
+                
+            } else {
+                // User is not signed in, redirect to login
+                console.log('User not authenticated, redirecting to login');
+                window.location.href = 'index.html';
             }
         });
-
-        // Make functions available globally
-        window.handleSignup = async function(event) {
-            event.preventDefault();
-            
-            const email = document.getElementById('signupEmail').value;
-            const password = document.getElementById('signupPassword').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            const errorDiv = document.getElementById('signupError');
-            const successDiv = document.getElementById('signupSuccess');
-            
-            // Reset messages
-            errorDiv.style.display = 'none';
-            successDiv.style.display = 'none';
-            
-            // Validate passwords match
-            if (password !== confirmPassword) {
-                errorDiv.textContent = 'Passwords do not match';
-                errorDiv.style.display = 'block';
-                return;
-            }
-            
-            try {
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                console.log('User created:', userCredential.user);
-                
-                successDiv.textContent = 'Account created successfully! Redirecting...';
-                successDiv.style.display = 'block';
-                
-                // Redirect to app after short delay
-                setTimeout(() => {
-                    window.location.href = 'app.html';
-                }, 1500);
-                
-            } catch (error) {
-                console.error('Signup error:', error);
-                errorDiv.textContent = getFirebaseErrorMessage(error.code);
-                errorDiv.style.display = 'block';
-            }
-        };
-
-        window.handleLogin = async function(event) {
-            event.preventDefault();
-            
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            const errorDiv = document.getElementById('loginError');
-            
-            // Reset error message
-            errorDiv.style.display = 'none';
-            
-            try {
-                const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                console.log('User signed in:', userCredential.user);
-                
-                // Redirect to app
-                window.location.href = 'app.html';
-                
-            } catch (error) {
-                console.error('Login error:', error);
-                errorDiv.textContent = getFirebaseErrorMessage(error.code);
-                errorDiv.style.display = 'block';
-            }
-        };
-
-        function getFirebaseErrorMessage(errorCode) {
-            switch (errorCode) {
-                case 'auth/user-not-found':
-                    return 'No account found with this email address.';
-                case 'auth/wrong-password':
-                    return 'Incorrect password.';
-                case 'auth/email-already-in-use':
-                    return 'An account with this email already exists.';
-                case 'auth/weak-password':
-                    return 'Password is too weak. Please use at least 6 characters.';
-                case 'auth/invalid-email':
-                    return 'Please enter a valid email address.';
-                case 'auth/too-many-requests':
-                    return 'Too many failed attempts. Please try again later.';
-                default:
-                    return 'An error occurred. Please try again.';
-            }
-        }
     </script>
 
     <script>
-        function showAuth(type) {
-            const modal = document.getElementById('authModal');
-            const loginForm = document.getElementById('loginForm');
-            const signupForm = document.getElementById('signupForm');
+        let currentStep = 0;
+
+        // REAL RESEARCH FUNCTION - CONNECTS TO YOUR VERCEL API
+        async function performResearch() {
+            const question = document.getElementById('research-question').value.trim();
             
-            if (type === 'login') {
-                loginForm.style.display = 'block';
-                signupForm.style.display = 'none';
-            } else {
-                loginForm.style.display = 'none';
-                signupForm.style.display = 'block';
+            if (!question) {
+                alert('Please enter a research question');
+                return;
             }
+
+            showResearchProgress();
+
+            try {
+                const response = await fetch('https://cookiejar-api.vercel.app/api/research', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ question })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                displayResults(data);
+            } catch (error) {
+                console.error('Research failed:', error);
+                document.getElementById('results').innerHTML = `
+                    <div class="error">
+                        <h3>Research Failed</h3>
+                        <p>Sorry, there was an error processing your research: ${error.message}</p>
+                        <p>Please try again or contact support if the problem persists.</p>
+                    </div>
+                `;
+                document.getElementById('processing-section').style.display = 'none';
+                document.getElementById('results-section').style.display = 'block';
+            }
+
+            hideResearchProgress();
+        }
+
+        function showResearchProgress() {
+            document.getElementById('input-section').style.display = 'none';
+            document.getElementById('processing-section').style.display = 'block';
+            document.getElementById('results-section').style.display = 'none';
             
-            modal.style.display = 'flex';
+            // Start processing animation
+            simulateProcessing();
         }
 
-        function hideAuth() {
-            document.getElementById('authModal').style.display = 'none';
+        function hideResearchProgress() {
+            // This will be called after results are displayed
         }
 
-        function switchAuth(type) {
-            showAuth(type);
+        function displayResults(data) {
+            document.getElementById('processing-section').style.display = 'none';
+            
+            const resultsHtml = `
+                <div class="result-header">
+                    <div class="result-title">${data.title}</div>
+                    <div class="result-meta">Generated ${data.processingTime || 'just now'}</div>
+                </div>
+                
+                <div class="result-stats">
+                    <div class="stat">
+                        <div class="stat-number">${data.sources?.length || 0}</div>
+                        <div class="stat-label">Sources Found</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">12</div>
+                        <div class="stat-label">Pages Generated</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">${Math.max(1, Math.floor((data.sources?.length || 0) * 0.8))}</div>
+                        <div class="stat-label">Citations</div>
+                    </div>
+                </div>
+
+                <h3>Research Summary:</h3>
+                <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+                    ${data.summary || 'Research summary not available.'}
+                </div>
+
+                <h3>Key Sources Found:</h3>
+                <div id="sources-preview">
+                    ${data.sources ? data.sources.map(source => `
+                        <div class="source-preview">
+                            <div class="source-title">${source.title}</div>
+                            <div class="source-meta">${source.url}</div>
+                            <div style="font-size: 0.9rem; margin-top: 0.5rem; color: #555;">${source.quote}</div>
+                        </div>
+                    `).join('') : '<p>No sources available</p>'}
+                </div>
+
+                <div class="download-section">
+                    <h3>Your Research Report is Ready!</h3>
+                    <p>Professional report with citations and methodology</p>
+                    <div style="margin-top: 1rem;">
+                        <button class="btn" style="background: white; color: #8b4513; margin-right: 1rem;">
+                            📄 Download PDF (Coming Soon)
+                        </button>
+                        <button class="btn" style="background: transparent; border: 2px solid white; color: white;">
+                            📧 Email Report (Coming Soon)
+                        </button>
+                    </div>
+                </div>
+
+                <button class="btn btn-secondary" onclick="startNewResearch()" style="margin-top: 1rem;">
+                    Start New Research
+                </button>
+            `;
+            
+            document.getElementById('results').innerHTML = resultsHtml;
+            document.getElementById('results-section').style.display = 'block';
         }
 
-        // Close modal when clicking outside
-        document.getElementById('authModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                hideAuth();
+        function simulateProcessing() {
+            currentStep = 0;
+            const stepElements = document.querySelectorAll('.processing-step');
+            
+            // Reset all steps
+            stepElements.forEach(step => {
+                step.classList.remove('active', 'completed');
+            });
+
+            // Start first step immediately
+            if (stepElements.length > 0) {
+                stepElements[0].classList.add('active');
+                currentStep = 1;
             }
-        });
 
-        // Close modal with Escape key
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                hideAuth();
+            // Animate through remaining steps
+            const interval = setInterval(() => {
+                if (currentStep > 1) {
+                    stepElements[currentStep - 2].classList.remove('active');
+                    stepElements[currentStep - 2].classList.add('completed');
+                }
+                
+                if (currentStep < stepElements.length) {
+                    stepElements[currentStep].classList.add('active');
+                    
+                    // Create crumbs for each step
+                    createCrumbs();
+                    
+                    currentStep++;
+                } else {
+                    // Complete final step
+                    stepElements[stepElements.length - 1].classList.remove('active');
+                    stepElements[stepElements.length - 1].classList.add('completed');
+                    clearInterval(interval);
+                }
+            }, 1500);
+        }
+
+        function createCrumbs() {
+            const container = document.querySelector('.cookie-container');
+            const numCrumbs = Math.floor(Math.random() * 5) + 3; // 3-7 crumbs
+            
+            for (let i = 0; i < numCrumbs; i++) {
+                const crumb = document.createElement('div');
+                crumb.className = 'crumb';
+                
+                // Random position around the cookie
+                const angle = Math.random() * 360;
+                const distance = 50 + Math.random() * 30;
+                const x = 100 + Math.cos(angle * Math.PI / 180) * distance;
+                const y = 100 + Math.sin(angle * Math.PI / 180) * distance;
+                
+                crumb.style.left = x + 'px';
+                crumb.style.top = y + 'px';
+                
+                container.appendChild(crumb);
+                
+                // Start falling animation
+                setTimeout(() => {
+                    crumb.classList.add('falling');
+                }, i * 150);
+                
+                // Remove after animation
+                setTimeout(() => {
+                    if (crumb.parentNode) {
+                        crumb.parentNode.removeChild(crumb);
+                    }
+                }, 2200);
             }
+        }
+
+        function startNewResearch() {
+            document.getElementById('results-section').style.display = 'none';
+            document.getElementById('input-section').style.display = 'block';
+            document.getElementById('research-question').value = '';
+            document.getElementById('research-question').focus();
+        }
+
+        function showExamples() {
+            const examples = [
+                'Impact of artificial intelligence on job displacement',
+                'Effectiveness of meditation on anxiety reduction',
+                'Climate change effects on coral reef ecosystems',
+                'Blockchain technology applications in healthcare',
+                'Remote learning effectiveness during COVID-19'
+            ];
+            
+            const randomExample = examples[Math.floor(Math.random() * examples.length)];
+            document.getElementById('research-question').value = randomExample;
+        }
+
+        // Auto-resize textarea
+        document.getElementById('research-question').addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.max(80, this.scrollHeight) + 'px';
         });
     </script>
 </body>
