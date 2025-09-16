@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cookiejar - Your Research Assistant</title>
+    <title>Cookiejar - Your Research Operating System</title>
     <style>
         * {
             margin: 0;
@@ -13,19 +13,12 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: #333;
             background: linear-gradient(135deg, #f5e6d3 0%, #e8d5c4 100%);
             min-height: 100vh;
+            color: #333;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        header {
+        .header {
             background: rgba(139, 69, 19, 0.95);
             color: white;
             padding: 1rem 0;
@@ -36,6 +29,9 @@
         }
 
         .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -44,84 +40,37 @@
         .logo {
             display: flex;
             align-items: center;
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             font-weight: bold;
         }
 
         .cookie-icon {
-            width: 40px;
-            height: 40px;
+            width: 35px;
+            height: 35px;
             margin-right: 10px;
             background: #d2691e;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            font-size: 18px;
         }
 
-        nav ul {
-            display: flex;
-            list-style: none;
-            gap: 2rem;
-        }
-
-        nav a {
-            color: white;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-
-        nav a:hover {
-            color: #f4a460;
-        }
-
-        .auth-buttons {
+        .nav-buttons {
             display: flex;
             gap: 1rem;
-        }
-
-        .hero {
-            text-align: center;
-            padding: 4rem 0;
-            background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(245,245,245,0.8) 100%);
-            margin: 2rem 0;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
-
-        .hero h1 {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            color: #8b4513;
-        }
-
-        .hero p {
-            font-size: 1.3rem;
-            margin-bottom: 2rem;
-            color: #666;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .cta-container {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            flex-wrap: wrap;
         }
 
         .btn {
-            padding: 12px 30px;
+            padding: 10px 25px;
             border: none;
             border-radius: 25px;
-            font-size: 1.1rem;
+            font-size: 0.95rem;
             cursor: pointer;
             transition: all 0.3s;
+            font-weight: 600;
             text-decoration: none;
             display: inline-block;
-            font-weight: 600;
         }
 
         .btn-primary {
@@ -137,84 +86,135 @@
 
         .btn-secondary {
             background: transparent;
-            color: #8b4513;
-            border: 2px solid #8b4513;
+            color: white;
+            border: 2px solid white;
         }
 
         .btn-secondary:hover {
-            background: #8b4513;
-            color: white;
+            background: white;
+            color: #8b4513;
         }
 
-        .btn-small {
-            padding: 8px 20px;
-            font-size: 0.9rem;
+        .hero {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 20px;
+            text-align: center;
         }
 
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            color: #8b4513;
+            font-weight: 700;
         }
 
-        /* Auth Modal Styles */
-        .modal {
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            color: #666;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta-container {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .hero .btn {
+            font-size: 1.1rem;
+            padding: 15px 35px;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 4rem;
+        }
+
+        .feature {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .feature:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature h3 {
+            color: #8b4513;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .auth-modal {
             display: none;
             position: fixed;
-            z-index: 1000;
-            left: 0;
             top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.5);
-            backdrop-filter: blur(5px);
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
         }
 
-        .modal-content {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+        .auth-content {
             background: white;
+            padding: 3rem;
             border-radius: 20px;
-            padding: 2rem;
-            width: 90%;
             max-width: 400px;
+            width: 90%;
+            position: relative;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
 
-        .modal-header {
+        .close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .auth-header {
             text-align: center;
             margin-bottom: 2rem;
         }
 
-        .modal-header h2 {
+        .auth-header h2 {
             color: #8b4513;
             margin-bottom: 0.5rem;
         }
 
-        .close {
-            position: absolute;
-            right: 1rem;
-            top: 1rem;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: #999;
-        }
-
-        .close:hover {
-            color: #333;
-        }
-
         .form-group {
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
         }
 
         .form-group label {
             display: block;
             margin-bottom: 0.5rem;
             color: #333;
-            font-weight: 600;
+            font-weight: 500;
         }
 
         .form-group input {
@@ -231,323 +231,179 @@
             border-color: #8b4513;
         }
 
-        .auth-toggle {
+        .auth-submit {
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+
+        .auth-switch {
             text-align: center;
-            margin-top: 1rem;
             color: #666;
         }
 
-        .auth-toggle a {
+        .auth-switch a {
             color: #8b4513;
             text-decoration: none;
             font-weight: 600;
         }
 
-        .auth-toggle a:hover {
+        .auth-switch a:hover {
             text-decoration: underline;
         }
 
         .error-message {
-            background: #fee;
-            color: #c33;
-            padding: 0.5rem;
-            border-radius: 4px;
-            margin-bottom: 1rem;
+            color: #dc3545;
             font-size: 0.9rem;
+            margin-top: 0.5rem;
+            display: none;
         }
 
         .success-message {
-            background: #efe;
-            color: #393;
-            padding: 0.5rem;
-            border-radius: 4px;
-            margin-bottom: 1rem;
+            color: #28a745;
             font-size: 0.9rem;
-        }
-
-        .loading {
-            opacity: 0.6;
-            pointer-events: none;
-        }
-
-        .demo-section {
-            padding: 3rem 0;
-            text-align: center;
-        }
-
-        .demo-container {
-            background: white;
-            border-radius: 15px;
-            padding: 2rem;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-            margin: 2rem 0;
-        }
-
-        .research-input {
-            width: 100%;
-            max-width: 600px;
-            padding: 15px;
-            border: 2px solid #ddd;
-            border-radius: 10px;
-            font-size: 1.1rem;
-            margin-bottom: 1rem;
-        }
-
-        .research-input:focus {
-            outline: none;
-            border-color: #8b4513;
-            box-shadow: 0 0 10px rgba(139, 69, 19, 0.2);
-        }
-
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            padding: 3rem 0;
-        }
-
-        .feature-card {
-            background: white;
-            padding: 2rem;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            transition: transform 0.3s;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .feature-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-        }
-
-        .pricing {
-            padding: 3rem 0;
-            text-align: center;
-        }
-
-        .pricing-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 2rem;
-            margin: 2rem 0;
-        }
-
-        .pricing-card {
-            background: white;
-            padding: 2rem;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            position: relative;
-        }
-
-        .pricing-card.featured {
-            border: 3px solid #8b4513;
-            transform: scale(1.05);
-        }
-
-        .price {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #8b4513;
-            margin: 1rem 0;
-        }
-
-        .waitlist-section {
-            background: linear-gradient(135deg, #8b4513, #d2691e);
-            color: white;
-            padding: 3rem 0;
-            text-align: center;
-            border-radius: 20px;
-            margin: 2rem 0;
-        }
-
-        footer {
-            background: #8b4513;
-            color: white;
-            text-align: center;
-            padding: 2rem 0;
-            margin-top: 3rem;
+            margin-top: 0.5rem;
+            display: none;
         }
 
         @media (max-width: 768px) {
-            .hero h1 { font-size: 2rem; }
-            .hero p { font-size: 1.1rem; }
-            .cta-container { flex-direction: column; align-items: center; }
-            .auth-buttons { flex-direction: column; }
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1.1rem;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+            }
+
+            .cta-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .nav-buttons {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
         }
     </style>
 </head>
 <body>
-    <header>
-        <div class="container">
-            <div class="header-content">
-                <div class="logo">
-                    <div class="cookie-icon">🍪</div>
-                    Cookiejar
-                </div>
-                <nav>
-                    <ul>
-                        <li><a href="#features">Features</a></li>
-                        <li><a href="#pricing">Pricing</a></li>
-                        <li><a href="#demo">Demo</a></li>
-                    </ul>
-                </nav>
-                <div class="auth-buttons">
-                    <button class="btn btn-secondary btn-small" onclick="showLogin()">Login</button>
-                    <button class="btn btn-primary btn-small" onclick="showSignup()">Sign Up</button>
-                </div>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="cookie-icon">🍪</div>
+                Cookiejar
+            </div>
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="showAuth('login')">Login</button>
+                <button class="btn btn-primary" onclick="showAuth('signup')">Sign Up</button>
             </div>
         </div>
     </header>
 
-    <!-- Auth Modal -->
-    <div id="authModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
-            <div class="modal-header">
-                <h2 id="modalTitle">Sign Up for Cookiejar</h2>
-                <p id="modalSubtitle">Start your research journey today</p>
-            </div>
-            
-            <div id="errorMessage" class="error-message" style="display: none;"></div>
-            <div id="successMessage" class="success-message" style="display: none;"></div>
-            
-            <form id="authForm">
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" required>
-                </div>
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" required>
-                </div>
-                <div class="form-group">
-                    <button type="submit" class="btn btn-primary" style="width: 100%;" id="authButton">
-                        Create Account
-                    </button>
-                </div>
-            </form>
-            
-            <div class="auth-toggle">
-                <span id="toggleText">Already have an account?</span>
-                <a href="#" id="toggleLink" onclick="toggleAuthMode()">Login</a>
-            </div>
+    <section class="hero">
+        <h1>Your Research Operating System</h1>
+        <p>Get reliable, understandable answers to any question. Break down language barriers, time periods, and academic gatekeeping.</p>
+        
+        <div class="cta-container">
+            <button class="btn btn-primary" onclick="showAuth('signup')">Start Researching</button>
+            <a href="#features" class="btn btn-secondary">Learn More</a>
         </div>
-    </div>
 
-    <div class="container">
-        <section class="hero">
-            <h1>Your Research Assistant</h1>
-            <p>Turn any research question into a comprehensive, cited report in 30 minutes. Real academic sources, perfect citations, professional formatting.</p>
-            <div class="cta-container">
-                <button class="btn btn-primary" onclick="showSignup()">Get Started Free</button>
-                <a href="#demo" class="btn btn-secondary">See Demo</a>
+        <div class="features" id="features">
+            <div class="feature">
+                <div class="feature-icon">🧠</div>
+                <h3>AI-Powered Research</h3>
+                <p>Advanced AI analyzes thousands of sources to create comprehensive, cited reports in minutes.</p>
             </div>
-        </section>
-
-        <section id="demo" class="demo-section">
-            <h2>Try It Out</h2>
-            <div class="demo-container">
-                <input type="text" class="research-input" placeholder="Enter your research question (e.g., 'Impact of social media on mental health')" id="research-question">
-                <br>
-                <button class="btn btn-primary" onclick="showSignup()">Generate Research Report</button>
-                <p style="margin-top: 1rem; color: #666; font-size: 0.9rem;">Create a free account to start researching</p>
-            </div>
-        </section>
-
-        <section id="features" class="features">
-            <div class="feature-card">
-                <div class="feature-icon">🎓</div>
+            <div class="feature">
+                <div class="feature-icon">📚</div>
                 <h3>Academic Sources</h3>
-                <p>Access PubMed, arXiv, Google Scholar, JSTOR, and more. Get research from the sources that matter.</p>
+                <p>Access PubMed, arXiv, JSTOR, and 100+ academic databases through one simple interface.</p>
             </div>
-            <div class="feature-card">
-                <div class="feature-icon">🤖</div>
-                <h3>Intelligent Synthesis</h3>
-                <p>Advanced algorithms read hundreds of papers and synthesize findings into clear, understandable reports.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">📝</div>
-                <h3>Perfect Citations</h3>
-                <p>Automatically formatted APA citations with source credibility scoring and bias detection.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">⚡</div>
-                <h3>30-Minute Reports</h3>
-                <p>What used to take weeks of manual research now takes 30 minutes. Focus on analysis, not data gathering.</p>
-            </div>
-            <div class="feature-card">
+            <div class="feature">
                 <div class="feature-icon">🔍</div>
-                <h3>Quality Control</h3>
-                <p>Source credibility analysis, bias detection, and research gap identification built in.</p>
+                <h3>Research DNA</h3>
+                <p>Unique methodology fingerprinting ensures reproducible, high-quality research every time.</p>
             </div>
-            <div class="feature-card">
-                <div class="feature-icon">📊</div>
-                <h3>Professional Output</h3>
-                <p>Clean PDF reports ready for submission, with charts, tables, and executive summaries.</p>
+            <div class="feature">
+                <div class="feature-icon">⏰</div>
+                <h3>Time Machine</h3>
+                <p>Track how understanding evolved over time and predict future research directions.</p>
             </div>
-        </section>
-
-        <section id="pricing" class="pricing">
-            <h2>Simple, Student-Friendly Pricing</h2>
-            <div class="pricing-cards">
-                <div class="pricing-card">
-                    <h3>Free</h3>
-                    <div class="price">$0</div>
-                    <ul style="text-align: left; margin: 1rem 0;">
-                        <li>✅ 2 research reports (lifetime)</li>
-                        <li>✅ Basic academic sources</li>
-                        <li>✅ APA citations</li>
-                        <li>❌ Watermarked PDFs</li>
-                    </ul>
-                    <button class="btn btn-secondary" onclick="showSignup()">Try Free</button>
-                </div>
-                <div class="pricing-card featured">
-                    <h3>Student</h3>
-                    <div class="price">$9<span style="font-size: 1rem;">/month</span></div>
-                    <ul style="text-align: left; margin: 1rem 0;">
-                        <li>✅ 15 research reports monthly</li>
-                        <li>✅ All academic sources</li>
-                        <li>✅ Clean PDFs with export</li>
-                        <li>✅ Priority processing</li>
-                        <li>✅ Email support</li>
-                    </ul>
-                    <button class="btn btn-primary" onclick="showSignup()">Get Started</button>
-                </div>
-                <div class="pricing-card">
-                    <h3>Researcher</h3>
-                    <div class="price">$19<span style="font-size: 1rem;">/month</span></div>
-                    <ul style="text-align: left; margin: 1rem 0;">
-                        <li>✅ Unlimited reports</li>
-                        <li>✅ Advanced bias detection</li>
-                        <li>✅ Multiple citation formats</li>
-                        <li>✅ Research alerts</li>
-                        <li>✅ Priority support</li>
-                    </ul>
-                    <button class="btn btn-secondary" onclick="showSignup()">Coming Soon</button>
-                </div>
+            <div class="feature">
+                <div class="feature-icon">🌍</div>
+                <h3>Ancient Texts</h3>
+                <p>Translate and analyze Hebrew, Greek, Latin, and other ancient documents with cultural context.</p>
             </div>
-        </section>
-
-        <section id="signup" class="waitlist-section">
-            <h2>Ready to Transform Your Research?</h2>
-            <p>Join thousands of researchers who've already discovered the future of academic research.</p>
-            <div style="margin-top: 2rem;">
-                <button class="btn" style="background: white; color: #8b4513; padding: 15px 40px; font-size: 1.2rem;" onclick="showSignup()">
-                    🍪 Start Researching Now
-                </button>
+            <div class="feature">
+                <div class="feature-icon">✅</div>
+                <h3>Bias Detection</h3>
+                <p>Automatically detect bias, controversy, and conflicting information across sources.</p>
             </div>
-        </section>
-    </div>
-
-    <footer>
-        <div class="container">
-            <p>&copy; 2024 Cookiejar. Making research delicious. 🍪</p>
         </div>
-    </footer>
+    </section>
+
+    <!-- Authentication Modal -->
+    <div id="authModal" class="auth-modal">
+        <div class="auth-content">
+            <button class="close-btn" onclick="hideAuth()">&times;</button>
+            
+            <!-- Login Form -->
+            <div id="loginForm">
+                <div class="auth-header">
+                    <h2>Welcome Back</h2>
+                    <p>Sign in to continue your research</p>
+                </div>
+                <form onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label for="loginEmail">Email</label>
+                        <input type="email" id="loginEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" required>
+                    </div>
+                    <div class="error-message" id="loginError"></div>
+                    <button type="submit" class="btn btn-primary auth-submit">Sign In</button>
+                </form>
+                <div class="auth-switch">
+                    Don't have an account? <a href="#" onclick="switchAuth('signup')">Sign up</a>
+                </div>
+            </div>
+
+            <!-- Signup Form -->
+            <div id="signupForm" style="display: none;">
+                <div class="auth-header">
+                    <h2>Join Cookiejar</h2>
+                    <p>Start your research journey today</p>
+                </div>
+                <form onsubmit="handleSignup(event)">
+                    <div class="form-group">
+                        <label for="signupEmail">Email</label>
+                        <input type="email" id="signupEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signupPassword">Password</label>
+                        <input type="password" id="signupPassword" required minlength="6">
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm Password</label>
+                        <input type="password" id="confirmPassword" required minlength="6">
+                    </div>
+                    <div class="error-message" id="signupError"></div>
+                    <div class="success-message" id="signupSuccess"></div>
+                    <button type="submit" class="btn btn-primary auth-submit">Create Account</button>
+                </form>
+                <div class="auth-switch">
+                    Already have an account? <a href="#" onclick="switchAuth('login')">Sign in</a>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Firebase SDK -->
     <script type="module">
@@ -556,6 +412,7 @@
 
         // Your Firebase configuration
         const firebaseConfig = {
+            apiKey: "AIzaSyBoP3cMo1gFGx2LVqFtVyDLQvaedqHmf4E",
             authDomain: "cookiejar-b639e.firebaseapp.com",
             projectId: "cookiejar-b639e",
             storageBucket: "cookiejar-b639e.firebasestorage.app",
@@ -568,200 +425,134 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
-        // Make auth available globally
-        window.auth = auth;
-        window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
-        window.signInWithEmailAndPassword = signInWithEmailAndPassword;
-
-        // Check if user is already logged in
+        // Check if user is already signed in
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                console.log('User is signed in:', user.email);
-                // Could redirect to app.html here if needed
-            } else {
-                console.log('User is signed out');
+                // User is signed in, redirect to app
+                window.location.href = 'app.html';
             }
         });
-    </script>
 
-    <script>
-        let isLoginMode = false;
-        let isLoading = false;
-
-        function showModal() {
-            document.getElementById('authModal').style.display = 'block';
-        }
-
-        function closeModal() {
-            document.getElementById('authModal').style.display = 'none';
-            clearMessages();
-            resetForm();
-        }
-
-        function showLogin() {
-            isLoginMode = true;
-            updateModalContent();
-            showModal();
-        }
-
-        function showSignup() {
-            isLoginMode = false;
-            updateModalContent();
-            showModal();
-        }
-
-        function updateModalContent() {
-            const title = document.getElementById('modalTitle');
-            const subtitle = document.getElementById('modalSubtitle');
-            const button = document.getElementById('authButton');
-            const toggleText = document.getElementById('toggleText');
-            const toggleLink = document.getElementById('toggleLink');
-
-            if (isLoginMode) {
-                title.textContent = 'Welcome Back';
-                subtitle.textContent = 'Login to your Cookiejar account';
-                button.textContent = 'Login';
-                toggleText.textContent = "Don't have an account?";
-                toggleLink.textContent = 'Sign Up';
-            } else {
-                title.textContent = 'Sign Up for Cookiejar';
-                subtitle.textContent = 'Start your research journey today';
-                button.textContent = 'Create Account';
-                toggleText.textContent = 'Already have an account?';
-                toggleLink.textContent = 'Login';
-            }
-        }
-
-        function toggleAuthMode() {
-            isLoginMode = !isLoginMode;
-            updateModalContent();
-            clearMessages();
-        }
-
-        function showError(message) {
-            const errorDiv = document.getElementById('errorMessage');
-            errorDiv.textContent = message;
-            errorDiv.style.display = 'block';
-            document.getElementById('successMessage').style.display = 'none';
-        }
-
-        function showSuccess(message) {
-            const successDiv = document.getElementById('successMessage');
-            successDiv.textContent = message;
-            successDiv.style.display = 'block';
-            document.getElementById('errorMessage').style.display = 'none';
-        }
-
-        function clearMessages() {
-            document.getElementById('errorMessage').style.display = 'none';
-            document.getElementById('successMessage').style.display = 'none';
-        }
-
-        function resetForm() {
-            document.getElementById('email').value = '';
-            document.getElementById('password').value = '';
-            isLoading = false;
-            updateButtonState();
-        }
-
-        function updateButtonState() {
-            const button = document.getElementById('authButton');
-            const form = document.getElementById('authForm');
+        // Make functions available globally
+        window.handleSignup = async function(event) {
+            event.preventDefault();
             
-            if (isLoading) {
-                button.disabled = true;
-                button.textContent = isLoginMode ? 'Logging in...' : 'Creating Account...';
-                form.classList.add('loading');
-            } else {
-                button.disabled = false;
-                button.textContent = isLoginMode ? 'Login' : 'Create Account';
-                form.classList.remove('loading');
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const errorDiv = document.getElementById('signupError');
+            const successDiv = document.getElementById('signupSuccess');
+            
+            // Reset messages
+            errorDiv.style.display = 'none';
+            successDiv.style.display = 'none';
+            
+            // Validate passwords match
+            if (password !== confirmPassword) {
+                errorDiv.textContent = 'Passwords do not match';
+                errorDiv.style.display = 'block';
+                return;
             }
-        }
+            
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                console.log('User created:', userCredential.user);
+                
+                successDiv.textContent = 'Account created successfully! Redirecting...';
+                successDiv.style.display = 'block';
+                
+                // Redirect to app after short delay
+                setTimeout(() => {
+                    window.location.href = 'app.html';
+                }, 1500);
+                
+            } catch (error) {
+                console.error('Signup error:', error);
+                errorDiv.textContent = getFirebaseErrorMessage(error.code);
+                errorDiv.style.display = 'block';
+            }
+        };
 
-        function getFirebaseErrorMessage(error) {
-            switch (error.code) {
+        window.handleLogin = async function(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const errorDiv = document.getElementById('loginError');
+            
+            // Reset error message
+            errorDiv.style.display = 'none';
+            
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                console.log('User signed in:', userCredential.user);
+                
+                // Redirect to app
+                window.location.href = 'app.html';
+                
+            } catch (error) {
+                console.error('Login error:', error);
+                errorDiv.textContent = getFirebaseErrorMessage(error.code);
+                errorDiv.style.display = 'block';
+            }
+        };
+
+        function getFirebaseErrorMessage(errorCode) {
+            switch (errorCode) {
+                case 'auth/user-not-found':
+                    return 'No account found with this email address.';
+                case 'auth/wrong-password':
+                    return 'Incorrect password.';
                 case 'auth/email-already-in-use':
-                    return 'An account with this email already exists. Try logging in instead.';
+                    return 'An account with this email already exists.';
                 case 'auth/weak-password':
                     return 'Password is too weak. Please use at least 6 characters.';
                 case 'auth/invalid-email':
                     return 'Please enter a valid email address.';
-                case 'auth/user-not-found':
-                    return 'No account found with this email. Please sign up first.';
-                case 'auth/wrong-password':
-                    return 'Incorrect password. Please try again.';
                 case 'auth/too-many-requests':
                     return 'Too many failed attempts. Please try again later.';
                 default:
                     return 'An error occurred. Please try again.';
             }
         }
+    </script>
 
-        // Handle form submission
-        document.getElementById('authForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
+    <script>
+        function showAuth(type) {
+            const modal = document.getElementById('authModal');
+            const loginForm = document.getElementById('loginForm');
+            const signupForm = document.getElementById('signupForm');
             
-            if (isLoading) return;
+            if (type === 'login') {
+                loginForm.style.display = 'block';
+                signupForm.style.display = 'none';
+            } else {
+                loginForm.style.display = 'none';
+                signupForm.style.display = 'block';
+            }
             
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
+            modal.style.display = 'flex';
+        }
 
-            // Basic validation
-            if (!email || !password) {
-                showError('Please fill in all fields');
-                return;
-            }
+        function hideAuth() {
+            document.getElementById('authModal').style.display = 'none';
+        }
 
-            if (password.length < 6) {
-                showError('Password must be at least 6 characters');
-                return;
-            }
+        function switchAuth(type) {
+            showAuth(type);
+        }
 
-            // Start loading state
-            isLoading = true;
-            updateButtonState();
-            clearMessages();
-
-            try {
-                if (isLoginMode) {
-                    // Login user
-                    const userCredential = await window.signInWithEmailAndPassword(window.auth, email, password);
-                    console.log('User logged in:', userCredential.user.email);
-                    showSuccess('Login successful! Redirecting...');
-                } else {
-                    // Create new user
-                    const userCredential = await window.createUserWithEmailAndPassword(window.auth, email, password);
-                    console.log('User created:', userCredential.user.email);
-                    showSuccess('Account created successfully! Redirecting...');
-                }
-
-                // Redirect to app after successful auth
-                setTimeout(() => {
-                    window.location.href = 'app.html';
-                }, 1500);
-
-            } catch (error) {
-                console.error('Auth error:', error);
-                showError(getFirebaseErrorMessage(error));
-            } finally {
-                isLoading = false;
-                updateButtonState();
+        // Close modal when clicking outside
+        document.getElementById('authModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                hideAuth();
             }
         });
 
-        // Close modal when clicking outside
-        window.onclick = function(event) {
-            const modal = document.getElementById('authModal');
-            if (event.target == modal) {
-                closeModal();
-            }
-        }
-
-        // Close modal on escape key
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape') {
-                closeModal();
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                hideAuth();
             }
         });
     </script>
