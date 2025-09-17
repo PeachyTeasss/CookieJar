@@ -12,11 +12,16 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #f5e6d3 0%, #e8d5c4 100%);
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(139, 69, 19, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(160, 82, 45, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(210, 180, 140, 0.1) 0%, transparent 50%),
+                linear-gradient(135deg, #f7f1e8 0%, #ede0d3 50%, #e3d4c5 100%);
             min-height: 100vh;
-            position: relative;
+            color: #2d2d2d;
             overflow-x: hidden;
+            position: relative;
         }
 
         /* Dynamic animated background */
@@ -238,104 +243,161 @@
             }
         }
 
+        /* Glass morphism header */
         .header {
-            background: rgba(139, 69, 19, 0.95);
-            color: white;
-            padding: 1rem 0;
-            position: sticky;
+            position: fixed;
             top: 0;
-            z-index: 100;
-            backdrop-filter: blur(10px);
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid rgba(139, 69, 19, 0.1);
+            padding: 1rem 0;
+            z-index: 1000;
+            transition: all 0.3s ease;
         }
 
         .header-content {
             max-width: 1200px;
             margin: 0 auto;
+            padding: 0 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 20px;
         }
 
         .logo {
+            font-size: 1.75rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #6B4423 0%, #8B4513 50%, #A0522D 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             display: flex;
             align-items: center;
-            font-size: 1.5rem;
-            font-weight: bold;
+            gap: 0.75rem;
+            letter-spacing: -0.5px;
         }
 
-        .cookie-icon {
-            width: 40px;
-            height: 40px;
-            margin-right: 10px;
-            background: #d2691e;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
+        .cookie-logo {
+            font-size: 2rem;
+            filter: drop-shadow(0 2px 4px rgba(139, 69, 19, 0.2));
         }
 
         .nav-buttons {
             display: flex;
-            align-items: center;
             gap: 1rem;
         }
 
         .btn {
-            padding: 10px 25px;
+            padding: 0.875rem 2rem;
             border: none;
-            border-radius: 25px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
             font-size: 0.95rem;
             cursor: pointer;
-            transition: all 0.3s;
-            font-weight: 600;
-            text-decoration: none;
-            display: inline-block;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.3px;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #8b4513, #d2691e);
+            background: linear-gradient(135deg, #8B4513 0%, #A0522D 50%, #8B4513 100%);
             color: white;
-            box-shadow: 0 4px 15px rgba(139, 69, 19, 0.3);
+            box-shadow: 0 4px 15px rgba(139, 69, 19, 0.2);
         }
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(139, 69, 19, 0.4);
+            box-shadow: 0 8px 25px rgba(139, 69, 19, 0.3);
         }
 
         .btn-secondary {
-            background: transparent;
-            color: white;
-            border: 2px solid white;
+            background: rgba(255, 255, 255, 0.8);
+            color: #6B4423;
+            border: 1.5px solid rgba(107, 68, 35, 0.2);
+            backdrop-filter: blur(10px);
         }
 
         .btn-secondary:hover {
-            background: white;
-            color: #8b4513;
+            background: rgba(107, 68, 35, 0.05);
+            border-color: rgba(107, 68, 35, 0.3);
+            transform: translateY(-1px);
         }
 
+        /* Hero section with enhanced design */
         .hero {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 4rem 20px;
+            margin-top: 80px;
+            min-height: calc(100vh - 80px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             text-align: center;
+            padding: 4rem 2rem;
             position: relative;
-            z-index: 1;
+        }
+
+        .hero-content {
+            max-width: 900px;
+            z-index: 2;
+            position: relative;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 0.5rem 1.25rem;
+            border-radius: 50px;
+            border: 1px solid rgba(139, 69, 19, 0.1);
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #6B4423;
+            box-shadow: 0 4px 20px rgba(139, 69, 19, 0.08);
         }
 
         .hero h1 {
-            font-size: 3.5rem;
-            margin-bottom: 1rem;
-            color: #8b4513;
-            font-weight: 700;
+            font-size: clamp(3rem, 8vw, 5rem);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #2d2d2d 0%, #6B4423 50%, #8B4513 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -2px;
         }
 
-        .hero p {
-            font-size: 1.3rem;
-            margin-bottom: 2rem;
-            color: #666;
+        .hero-subtitle {
+            font-size: clamp(1.25rem, 3vw, 1.5rem);
+            color: #5a5a5a;
+            margin-bottom: 3rem;
+            line-height: 1.6;
+            font-weight: 400;
             max-width: 700px;
             margin-left: auto;
             margin-right: auto;
@@ -343,95 +405,180 @@
 
         .cta-container {
             display: flex;
-            align-items: center;
             gap: 1.5rem;
             justify-content: center;
-            margin-bottom: 3rem;
             flex-wrap: wrap;
+            margin-bottom: 3rem;
         }
 
-        .hero .btn {
+        .cta-container .btn {
             font-size: 1.1rem;
-            padding: 15px 35px;
+            padding: 1.25rem 3rem;
         }
 
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
+        /* Trust indicators */
+        .trust-indicators {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 3rem;
             margin-top: 4rem;
+            flex-wrap: wrap;
+            opacity: 0.7;
         }
 
-        .feature {
-            background: rgba(255, 255, 255, 0.9);
-            padding: 2rem;
+        .trust-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.95rem;
+            color: #6B4423;
+            font-weight: 500;
+        }
+
+        .trust-icon {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, #8B4513, #A0522D);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.8rem;
+        }
+
+        /* Features preview cards */
+        .features-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 6rem;
+            padding: 0 2rem;
+            max-width: 1200px;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(139, 69, 19, 0.1);
             border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 2.5rem 2rem;
             text-align: center;
-            transition: transform 0.3s;
-            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
 
-        .feature:hover {
-            transform: translateY(-5px);
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #8B4513, #A0522D, #8B4513);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(139, 69, 19, 0.15);
+            background: rgba(255, 255, 255, 0.8);
         }
 
         .feature-icon {
             font-size: 3rem;
+            margin-bottom: 1.5rem;
+            filter: drop-shadow(0 4px 8px rgba(139, 69, 19, 0.2));
+        }
+
+        .feature-card h3 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #2d2d2d;
             margin-bottom: 1rem;
         }
 
-        .feature h3 {
-            color: #8b4513;
-            margin-bottom: 1rem;
-            font-size: 1.3rem;
+        .feature-card p {
+            color: #666;
+            line-height: 1.6;
+            font-size: 0.95rem;
         }
 
-        .auth-modal {
+        /* Modal styles (keeping your existing modal with glassmorphism) */
+        .modal {
             display: none;
             position: fixed;
-            top: 0;
+            z-index: 2000;
             left: 0;
+            top: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.7);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-            backdrop-filter: blur(5px);
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
         }
 
-        .auth-content {
+        .modal-content {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
+            margin: 5% auto;
             padding: 3rem;
-            border-radius: 20px;
-            max-width: 400px;
+            border-radius: 24px;
             width: 90%;
+            max-width: 420px;
             position: relative;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: modalSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .close-btn {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background: none;
-            border: none;
-            font-size: 1.5rem;
+        @keyframes modalSlideIn {
+            from { 
+                transform: translateY(-30px) scale(0.95); 
+                opacity: 0; 
+            }
+            to { 
+                transform: translateY(0) scale(1); 
+                opacity: 1; 
+            }
+        }
+
+        .close {
+            color: #999;
+            float: right;
+            font-size: 28px;
             font-weight: bold;
             cursor: pointer;
-            color: #8b4513;
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            transition: color 0.3s ease;
         }
 
-        .auth-header {
+        .close:hover {
+            color: #6B4423;
+        }
+
+        .modal h2 {
+            color: #2d2d2d;
+            margin-bottom: 0.75rem;
             text-align: center;
-            margin-bottom: 2rem;
+            font-size: 1.75rem;
+            font-weight: 700;
         }
 
-        .auth-header h2 {
-            color: #8b4513;
-            margin-bottom: 0.5rem;
+        .modal p {
+            color: #666;
+            margin-bottom: 2rem;
+            text-align: center;
+            font-size: 0.95rem;
+            line-height: 1.5;
         }
 
         .form-group {
@@ -440,70 +587,129 @@
 
         .form-group label {
             display: block;
-            margin-bottom: 0.5rem;
-            color: #333;
-            font-weight: 500;
+            margin-bottom: 0.75rem;
+            color: #2d2d2d;
+            font-weight: 600;
+            font-size: 0.9rem;
         }
 
         .form-group input {
             width: 100%;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
+            padding: 1rem;
+            border: 2px solid rgba(139, 69, 19, 0.1);
+            border-radius: 12px;
             font-size: 1rem;
-            transition: border-color 0.3s;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
         }
 
         .form-group input:focus {
             outline: none;
-            border-color: #8b4513;
+            border-color: #A0522D;
+            box-shadow: 0 0 0 3px rgba(160, 82, 45, 0.1);
+            background: rgba(255, 255, 255, 0.95);
         }
 
-        .auth-submit {
+        .auth-button {
             width: 100%;
-            margin-bottom: 1rem;
+            padding: 1rem;
+            background: linear-gradient(135deg, #8B4513 0%, #A0522D 50%, #8B4513 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 1.5rem 0;
+            position: relative;
+            overflow: hidden;
         }
 
-        .auth-switch {
+        .auth-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .auth-button:hover:not(:disabled)::before {
+            left: 100%;
+        }
+
+        .auth-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(139, 69, 19, 0.3);
+        }
+
+        .auth-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .toggle-auth {
             text-align: center;
+            margin-top: 1.5rem;
             color: #666;
         }
 
-        .auth-switch a {
-            color: #8b4513;
+        .toggle-auth a {
+            color: #A0522D;
             text-decoration: none;
             font-weight: 600;
+            transition: color 0.3s ease;
         }
 
-        .auth-switch a:hover {
-            text-decoration: underline;
+        .toggle-auth a:hover {
+            color: #8B4513;
+        }
+
+        .error-message, .success-message {
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+            font-weight: 500;
         }
 
         .error-message {
-            color: #dc3545;
-            font-size: 0.9rem;
-            margin-top: 0.5rem;
-            display: none;
+            background: rgba(248, 215, 218, 0.9);
+            color: #721c24;
+            border: 1px solid rgba(245, 198, 203, 0.5);
         }
 
         .success-message {
-            color: #28a745;
-            font-size: 0.9rem;
-            margin-top: 0.5rem;
-            display: none;
+            background: rgba(212, 237, 218, 0.9);
+            color: #155724;
+            border: 1px solid rgba(195, 230, 203, 0.5);
         }
 
+        .forgot-password {
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .forgot-password a {
+            color: #A0522D;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .forgot-password a:hover {
+            color: #8B4513;
+        }
+
+        /* Responsive design */
         @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 2.5rem;
-            }
-
-            .hero p {
-                font-size: 1.1rem;
-            }
-
-            .features {
-                grid-template-columns: 1fr;
+            .hero {
+                padding: 2rem 1rem;
             }
 
             .cta-container {
@@ -511,9 +717,42 @@
                 align-items: center;
             }
 
+            .btn {
+                min-width: 200px;
+            }
+
+            .trust-indicators {
+                gap: 1.5rem;
+            }
+
+            .features-preview {
+                grid-template-columns: 1fr;
+                margin-top: 4rem;
+                padding: 0 1rem;
+            }
+
+            .modal-content {
+                margin: 10% auto;
+                padding: 2rem;
+            }
+
+            .header-content {
+                padding: 0 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo {
+                font-size: 1.4rem;
+            }
+
             .nav-buttons {
-                flex-direction: column;
                 gap: 0.5rem;
+            }
+
+            .btn {
+                padding: 0.75rem 1.5rem;
+                font-size: 0.9rem;
             }
         }
     </style>
@@ -550,113 +789,109 @@
     <header class="header">
         <div class="header-content">
             <div class="logo">
-                <div class="cookie-icon">🍪</div>
+                <span class="cookie-logo">🍪</span>
                 Cookiejar
             </div>
-            <div class="nav-buttons">
-                <button class="btn btn-secondary" onclick="showAuth('login')">Login</button>
-                <button class="btn btn-primary" onclick="showAuth('signup')">Sign Up</button>
-            </div>
+            <nav class="nav-buttons">
+                <a href="#" class="btn btn-secondary" onclick="showLogin()">Login</a>
+                <a href="#" class="btn btn-primary" onclick="showSignup()">Get Started</a>
+            </nav>
         </div>
     </header>
 
-    <section class="hero">
-        <h1>Your Research Operating System</h1>
-        <p>Get reliable, understandable answers to any question. Break down language barriers, time periods, and academic gatekeeping.</p>
-        
-        <div class="cta-container">
-            <button class="btn btn-primary" onclick="showAuth('signup')">Start Researching</button>
-            <a href="#features" class="btn btn-secondary">Learn More</a>
+    <main class="hero">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <span>🎯</span>
+                The Complete Research Operating System
+            </div>
+            
+            <h1>Knowledge Without Barriers</h1>
+            
+            <p class="hero-subtitle">
+                Transform any question into comprehensive, cited research reports in minutes. 
+                Access academic papers, ancient texts, and global knowledge with intelligent synthesis.
+            </p>
+            
+            <div class="cta-container">
+                <a href="#" class="btn btn-primary" onclick="showSignup()">Start Researching Free</a>
+                <a href="#demo" class="btn btn-secondary">Watch Demo</a>
+            </div>
+
+            <div class="trust-indicators">
+                <div class="trust-item">
+                    <div class="trust-icon">✓</div>
+                    100M+ Sources
+                </div>
+                <div class="trust-item">
+                    <div class="trust-icon">⚡</div>
+                    Intelligent Synthesis
+                </div>
+                <div class="trust-item">
+                    <div class="trust-icon">🔒</div>
+                    Always Cited
+                </div>
+                <div class="trust-item">
+                    <div class="trust-icon">🌍</div>
+                    120+ Languages
+                </div>
+            </div>
         </div>
 
-        <div class="features" id="features">
-            <div class="feature">
-                <div class="feature-icon">🧠</div>
-                <h3>Intelligent Research</h3>
-                <p>Advanced analysis of thousands of sources to create comprehensive, cited reports in minutes.</p>
-            </div>
-            <div class="feature">
-                <div class="feature-icon">📚</div>
-                <h3>Academic Sources</h3>
-                <p>Access PubMed, arXiv, JSTOR, and 100+ academic databases through one simple interface.</p>
-            </div>
-            <div class="feature">
-                <div class="feature-icon">🔍</div>
+        <div class="features-preview">
+            <div class="feature-card">
+                <div class="feature-icon">🧬</div>
                 <h3>Research DNA</h3>
-                <p>Unique methodology fingerprinting ensures reproducible, high-quality research every time.</p>
+                <p>Every report comes with methodology fingerprinting, showing exactly how conclusions were reached with full reproducibility.</p>
             </div>
-            <div class="feature">
+            
+            <div class="feature-card">
                 <div class="feature-icon">⏰</div>
                 <h3>Time Machine</h3>
-                <p>Track how understanding evolved over time and predict future research directions.</p>
+                <p>See how understanding evolved over decades. Track consensus changes and paradigm shifts in any field.</p>
             </div>
-            <div class="feature">
-                <div class="feature-icon">🌍</div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🌐</div>
                 <h3>Ancient Texts</h3>
-                <p>Translate and analyze Hebrew, Greek, Latin, and other ancient documents with cultural context.</p>
-            </div>
-            <div class="feature">
-                <div class="feature-icon">✅</div>
-                <h3>Bias Detection</h3>
-                <p>Automatically detect bias, controversy, and conflicting information across sources.</p>
+                <p>Translate and analyze Hebrew, Greek, Latin, Sanskrit, and more with cultural context and scholarly interpretations.</p>
             </div>
         </div>
-    </section>
+    </main>
 
     <!-- Authentication Modal -->
-    <div id="authModal" class="auth-modal">
-        <div class="auth-content">
-            <button class="close-btn" onclick="hideAuth()">&times;</button>
-
-            <!-- Login Form -->
-            <div id="loginForm">
-                <div class="auth-header">
-                    <h2>Welcome Back</h2>
-                    <p>Sign in to continue your research</p>
+    <div id="authModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2 id="modalTitle">Create Account</h2>
+            <p id="modalSubtitle">Join thousands of researchers discovering knowledge</p>
+            
+            <div id="messageContainer"></div>
+            
+            <form id="authForm">
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" required>
                 </div>
-                <form onsubmit="handleLogin(event)">
-                    <div class="form-group">
-                        <label for="loginEmail">Email</label>
-                        <input type="email" id="loginEmail" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="loginPassword">Password</label>
-                        <input type="password" id="loginPassword" required>
-                    </div>
-                    <div class="error-message" id="loginError"></div>
-                    <button type="submit" class="btn btn-primary auth-submit">Sign In</button>
-                </form>
-                <div class="auth-switch">
-                    Don't have an account? <a href="#" onclick="switchAuth('signup')">Sign up</a>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required minlength="6">
                 </div>
-            </div>
-
-            <!-- Signup Form -->
-            <div id="signupForm" style="display: none;">
-                <div class="auth-header">
-                    <h2>Join Cookiejar</h2>
-                    <p>Start your research journey today</p>
+                <div class="form-group" id="confirmPasswordGroup">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" required>
                 </div>
-                <form onsubmit="handleSignup(event)">
-                    <div class="form-group">
-                        <label for="signupEmail">Email</label>
-                        <input type="email" id="signupEmail" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="signupPassword">Password</label>
-                        <input type="password" id="signupPassword" required minlength="6">
-                    </div>
-                    <div class="form-group">
-                        <label for="confirmPassword">Confirm Password</label>
-                        <input type="password" id="confirmPassword" required minlength="6">
-                    </div>
-                    <div class="error-message" id="signupError"></div>
-                    <div class="success-message" id="signupSuccess"></div>
-                    <button type="submit" class="btn btn-primary auth-submit">Create Account</button>
-                </form>
-                <div class="auth-switch">
-                    Already have an account? <a href="#" onclick="switchAuth('login')">Sign in</a>
+                
+                <button type="submit" class="auth-button" id="authButton">Create Account</button>
+                
+                <div class="forgot-password" id="forgotPasswordLink" style="display: none;">
+                    <a href="reset-password.html">Forgot your password?</a>
                 </div>
+            </form>
+            
+            <div class="toggle-auth">
+                <span id="toggleText">Already have an account?</span>
+                <a href="#" id="toggleLink" onclick="toggleAuthMode()">Login</a>
             </div>
         </div>
     </div>
@@ -693,29 +928,28 @@
         window.handleSignup = async function(event) {
             event.preventDefault();
             
-            const email = document.getElementById('signupEmail').value;
-            const password = document.getElementById('signupPassword').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
-            const errorDiv = document.getElementById('signupError');
-            const successDiv = document.getElementById('signupSuccess');
-            
-            // Reset messages
-            errorDiv.style.display = 'none';
-            successDiv.style.display = 'none';
             
             // Validate passwords match
             if (password !== confirmPassword) {
-                errorDiv.textContent = 'Passwords do not match';
-                errorDiv.style.display = 'block';
+                showMessage('Passwords do not match.', 'error');
                 return;
             }
+            
+            if (password.length < 6) {
+                showMessage('Password must be at least 6 characters long.', 'error');
+                return;
+            }
+
+            clearMessages();
             
             try {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 console.log('User created:', userCredential.user);
                 
-                successDiv.textContent = 'Account created successfully! Redirecting...';
-                successDiv.style.display = 'block';
+                showMessage('Account created successfully! Redirecting...', 'success');
                 
                 // Redirect to app after short delay
                 setTimeout(() => {
@@ -724,32 +958,32 @@
                 
             } catch (error) {
                 console.error('Signup error:', error);
-                errorDiv.textContent = getFirebaseErrorMessage(error.code);
-                errorDiv.style.display = 'block';
+                showMessage(getFirebaseErrorMessage(error.code), 'error');
             }
         };
 
         window.handleLogin = async function(event) {
             event.preventDefault();
             
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            const errorDiv = document.getElementById('loginError');
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
             
-            // Reset error message
-            errorDiv.style.display = 'none';
+            clearMessages();
             
             try {
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
                 console.log('User signed in:', userCredential.user);
                 
+                showMessage('Login successful! Redirecting...', 'success');
+                
                 // Redirect to app
-                window.location.href = 'app.html';
+                setTimeout(() => {
+                    window.location.href = 'app.html';
+                }, 1500);
                 
             } catch (error) {
                 console.error('Login error:', error);
-                errorDiv.textContent = getFirebaseErrorMessage(error.code);
-                errorDiv.style.display = 'block';
+                showMessage(getFirebaseErrorMessage(error.code), 'error');
             }
         };
 
@@ -774,53 +1008,101 @@
     </script>
 
     <script>
-    </script>
+        let isLoginMode = false;
 
-    <script>
         // Global functions for authentication
         function showLogin() {
-            showAuth('login');
+            isLoginMode = true;
+            updateModalContent();
+            showModal();
         }
 
         function showSignup() {
-            showAuth('signup');
+            isLoginMode = false;
+            updateModalContent();
+            showModal();
         }
 
-        function showAuth(type) {
-            const modal = document.getElementById('authModal');
-            const loginForm = document.getElementById('loginForm');
-            const signupForm = document.getElementById('signupForm');
-
-            if (type === 'login') {
-                loginForm.style.display = 'block';
-                signupForm.style.display = 'none';
-            } else {
-                loginForm.style.display = 'none';
-                signupForm.style.display = 'block';
-            }
-
-            modal.style.display = 'flex';
+        function showModal() {
+            document.getElementById('authModal').style.display = 'block';
         }
 
-        function hideAuth() {
+        function closeModal() {
             document.getElementById('authModal').style.display = 'none';
+            clearMessages();
+            resetForm();
         }
 
-        function switchAuth(type) {
-            showAuth(type);
+        function toggleAuthMode() {
+            isLoginMode = !isLoginMode;
+            updateModalContent();
+            clearMessages();
         }
 
-        // Close modal when clicking outside
-        document.getElementById('authModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                hideAuth();
+        function updateModalContent() {
+            const title = document.getElementById('modalTitle');
+            const subtitle = document.getElementById('modalSubtitle');
+            const button = document.getElementById('authButton');
+            const toggleText = document.getElementById('toggleText');
+            const toggleLink = document.getElementById('toggleLink');
+            const confirmPasswordGroup = document.getElementById('confirmPasswordGroup');
+            const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+
+            if (isLoginMode) {
+                title.textContent = 'Welcome Back';
+                subtitle.textContent = 'Login to your Cookiejar account';
+                button.textContent = 'Login';
+                toggleText.textContent = "Don't have an account?";
+                toggleLink.textContent = 'Sign Up';
+                confirmPasswordGroup.style.display = 'none';
+                forgotPasswordLink.style.display = 'block';
+            } else {
+                title.textContent = 'Create Account';
+                subtitle.textContent = 'Join thousands of researchers discovering knowledge';
+                button.textContent = 'Create Account';
+                toggleText.textContent = 'Already have an account?';
+                toggleLink.textContent = 'Login';
+                confirmPasswordGroup.style.display = 'block';
+                forgotPasswordLink.style.display = 'none';
+            }
+        }
+
+        function showMessage(text, type) {
+            const container = document.getElementById('messageContainer');
+            container.innerHTML = `<div class="${type}-message">${text}</div>`;
+        }
+
+        function clearMessages() {
+            document.getElementById('messageContainer').innerHTML = '';
+        }
+
+        function resetForm() {
+            document.getElementById('authForm').reset();
+        }
+
+        // Handle form submission
+        document.getElementById('authForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (isLoginMode) {
+                await window.handleLogin(e);
+            } else {
+                await window.handleSignup(e);
             }
         });
 
-        // Close modal with Escape key
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                hideAuth();
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('authModal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+
+        // Close modal on escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal();
             }
         });
     </script>
