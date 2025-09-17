@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cookiejar Research App</title>
+    <title>Cookiejar - Research Operating System</title>
+    <meta name="description" content="Transform any question into comprehensive, cited research reports. Access academic papers, ancient texts, and global knowledge with AI synthesis.">
     <style>
         * {
             margin: 0;
@@ -327,9 +328,16 @@
             box-shadow: 0 4px 15px rgba(139, 69, 19, 0.2);
         }
 
-        .btn-primary:hover {
+        .btn-primary:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(139, 69, 19, 0.3);
+        }
+
+        .btn-primary:disabled {
+            background: linear-gradient(135deg, #ccc 0%, #999 50%, #ccc 100%);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
 
         .btn-secondary {
@@ -611,6 +619,27 @@
             background: rgba(255, 255, 255, 0.95);
         }
 
+        .password-requirements {
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .requirement {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0.25rem 0;
+        }
+
+        .requirement.met {
+            color: #28a745;
+        }
+
+        .requirement.unmet {
+            color: #dc3545;
+        }
+
         .auth-button {
             width: 100%;
             padding: 1rem;
@@ -648,9 +677,30 @@
         }
 
         .auth-button:disabled {
-            background: #ccc;
+            background: linear-gradient(135deg, #ccc 0%, #999 50%, #ccc 100%);
             cursor: not-allowed;
             transform: none;
+        }
+
+        .auth-button.loading {
+            position: relative;
+        }
+
+        .auth-button.loading::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            margin: auto;
+            border: 2px solid transparent;
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         .toggle-auth {
@@ -753,6 +803,13 @@
             .btn {
                 padding: 0.75rem 1.5rem;
                 font-size: 0.9rem;
+            }
+
+            .modal-content {
+                margin: 5% auto;
+                width: 95%;
+                padding: 2rem 1.5rem;
+                border-radius: 16px;
             }
         }
     </style>
@@ -860,9 +917,9 @@
     </main>
 
     <!-- Authentication Modal -->
-    <div id="authModal" class="modal">
+    <div id="authModal" class="modal" role="dialog" aria-labelledby="modalTitle" aria-describedby="modalSubtitle">
         <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
+            <span class="close" onclick="closeModal()" aria-label="Close modal">&times;</span>
             <h2 id="modalTitle">Create Account</h2>
             <p id="modalSubtitle">Join thousands of researchers discovering knowledge</p>
             
@@ -871,21 +928,38 @@
             <form id="authForm">
                 <div class="form-group">
                     <label for="email">Email Address</label>
-                    <input type="email" id="email" name="email" required>
+                    <input type="email" id="email" name="email" required autocomplete="email">
                 </div>
                 <div class="form-group">
                     <label for="password">Password</label>
-                    <input type="password" id="password" name="password" required minlength="6">
+                    <input type="password" id="password" name="password" required minlength="8" autocomplete="new-password">
+                    <div class="password-requirements" id="passwordRequirements" style="display: none;">
+                        <div class="requirement" id="req-length">
+                            <span>●</span> At least 8 characters
+                        </div>
+                        <div class="requirement" id="req-upper">
+                            <span>●</span> One uppercase letter
+                        </div>
+                        <div class="requirement" id="req-lower">
+                            <span>●</span> One lowercase letter
+                        </div>
+                        <div class="requirement" id="req-number">
+                            <span>●</span> One number
+                        </div>
+                        <div class="requirement" id="req-special">
+                            <span>●</span> One special character
+                        </div>
+                    </div>
                 </div>
                 <div class="form-group" id="confirmPasswordGroup">
                     <label for="confirmPassword">Confirm Password</label>
-                    <input type="password" id="confirmPassword" name="confirmPassword" required>
+                    <input type="password" id="confirmPassword" name="confirmPassword" required autocomplete="new-password">
                 </div>
                 
                 <button type="submit" class="auth-button" id="authButton">Create Account</button>
                 
                 <div class="forgot-password" id="forgotPasswordLink" style="display: none;">
-                    <a href="#" onclick="alert('Password reset feature coming soon!')">Forgot your password?</a>
+                    <a href="#" onclick="handleForgotPassword()">Forgot your password?</a>
                 </div>
             </form>
             
@@ -899,9 +973,9 @@
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 
-        // Your Firebase configuration
+        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyBoP3cMo1gFGx2LVqFtVyDLQvaedqHmf4E",
             authDomain: "cookiejar-b639e.firebaseapp.com",
@@ -912,105 +986,278 @@
             measurementId: "G-XBRZR7KS0R"
         };
 
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
+        let app;
+        let auth;
+
+        try {
+            // Initialize Firebase
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+        } catch (error) {
+            console.error('Firebase initialization failed:', error);
+            showCriticalError('Unable to initialize authentication. Please refresh and try again.');
+        }
 
         // Check if user is already signed in
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 // User is signed in, redirect to app
+                console.log('User already authenticated, redirecting...');
                 window.location.href = 'app.html';
             }
         });
 
-        // Make functions available globally
+        // Password validation function
+        function validatePassword(password) {
+            const requirements = {
+                length: password.length >= 8,
+                upper: /[A-Z]/.test(password),
+                lower: /[a-z]/.test(password),
+                number: /\d/.test(password),
+                special: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+            };
+
+            return requirements;
+        }
+
+        // Email validation function
+        function validateEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        // Rate limiting
+        let lastAttemptTime = 0;
+        const ATTEMPT_COOLDOWN = 3000; // 3 seconds
+
+        function checkRateLimit() {
+            const now = Date.now();
+            if (now - lastAttemptTime < ATTEMPT_COOLDOWN) {
+                const remainingTime = Math.ceil((ATTEMPT_COOLDOWN - (now - lastAttemptTime)) / 1000);
+                throw new Error(`Please wait ${remainingTime} seconds before trying again.`);
+            }
+            lastAttemptTime = now;
+        }
+
+        // Secure message display (prevents XSS)
+        function sanitizeText(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function showMessage(text, type) {
+            const container = document.getElementById('messageContainer');
+            const sanitizedText = sanitizeText(text);
+            const sanitizedType = ['error', 'success'].includes(type) ? type : 'error';
+            
+            container.innerHTML = `<div class="${sanitizedType}-message">${sanitizedText}</div>`;
+            
+            // Auto-remove success messages after 5 seconds
+            if (type === 'success') {
+                setTimeout(() => {
+                    if (container.innerHTML.includes(sanitizedText)) {
+                        container.innerHTML = '';
+                    }
+                }, 5000);
+            }
+        }
+
+        function clearMessages() {
+            document.getElementById('messageContainer').innerHTML = '';
+        }
+
+        function showCriticalError(message) {
+            document.body.innerHTML = `
+                <div style="display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #f5f5f5; font-family: system-ui;">
+                    <div style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); max-width: 400px; text-align: center;">
+                        <h2 style="color: #dc3545; margin-bottom: 1rem;">🍪 Cookiejar</h2>
+                        <p style="margin-bottom: 1rem;">${sanitizeText(message)}</p>
+                        <button onclick="location.reload()" style="padding: 0.5rem 1rem; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                            Refresh Page
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Global authentication functions
         window.handleSignup = async function(event) {
             event.preventDefault();
             
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            
-            // Validate passwords match
-            if (password !== confirmPassword) {
-                showMessage('Passwords do not match.', 'error');
-                return;
-            }
-            
-            if (password.length < 6) {
-                showMessage('Password must be at least 6 characters long.', 'error');
-                return;
-            }
-
-            clearMessages();
+            const submitButton = document.getElementById('authButton');
+            const originalText = submitButton.textContent;
             
             try {
+                // Rate limiting
+                checkRateLimit();
+                
+                // Get form data
+                const email = document.getElementById('email').value.trim();
+                const password = document.getElementById('password').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+                
+                // Clear previous messages
+                clearMessages();
+                
+                // Validation
+                if (!email || !password) {
+                    throw new Error('Email and password are required');
+                }
+                
+                if (!validateEmail(email)) {
+                    throw new Error('Please enter a valid email address');
+                }
+                
+                const passwordRequirements = validatePassword(password);
+                if (!Object.values(passwordRequirements).every(req => req)) {
+                    throw new Error('Password does not meet security requirements');
+                }
+                
+                if (password !== confirmPassword) {
+                    throw new Error('Passwords do not match');
+                }
+                
+                // Disable button and show loading
+                submitButton.disabled = true;
+                submitButton.classList.add('loading');
+                submitButton.textContent = 'Creating Account...';
+                
+                // Create user
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                console.log('User created:', userCredential.user);
+                console.log('User created successfully:', userCredential.user.email);
                 
                 showMessage('Account created successfully! Redirecting...', 'success');
                 
-                // Redirect to app after short delay
+                // Redirect after delay
                 setTimeout(() => {
                     window.location.href = 'app.html';
                 }, 1500);
                 
             } catch (error) {
                 console.error('Signup error:', error);
-                showMessage(getFirebaseErrorMessage(error.code), 'error');
+                showMessage(getFirebaseErrorMessage(error.code || error.message), 'error');
+            } finally {
+                // Re-enable button
+                submitButton.disabled = false;
+                submitButton.classList.remove('loading');
+                submitButton.textContent = originalText;
             }
         };
 
         window.handleLogin = async function(event) {
             event.preventDefault();
             
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            
-            clearMessages();
+            const submitButton = document.getElementById('authButton');
+            const originalText = submitButton.textContent;
             
             try {
+                // Rate limiting
+                checkRateLimit();
+                
+                // Get form data
+                const email = document.getElementById('email').value.trim();
+                const password = document.getElementById('password').value;
+                
+                // Clear previous messages
+                clearMessages();
+                
+                // Validation
+                if (!email || !password) {
+                    throw new Error('Email and password are required');
+                }
+                
+                if (!validateEmail(email)) {
+                    throw new Error('Please enter a valid email address');
+                }
+                
+                // Disable button and show loading
+                submitButton.disabled = true;
+                submitButton.classList.add('loading');
+                submitButton.textContent = 'Signing In...';
+                
+                // Sign in user
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                console.log('User signed in:', userCredential.user);
+                console.log('User signed in successfully:', userCredential.user.email);
                 
                 showMessage('Login successful! Redirecting...', 'success');
                 
-                // Redirect to app
+                // Redirect after delay
                 setTimeout(() => {
                     window.location.href = 'app.html';
                 }, 1500);
                 
             } catch (error) {
                 console.error('Login error:', error);
+                showMessage(getFirebaseErrorMessage(error.code || error.message), 'error');
+            } finally {
+                // Re-enable button
+                submitButton.disabled = false;
+                submitButton.classList.remove('loading');
+                submitButton.textContent = originalText;
+            }
+        };
+
+        window.handleForgotPassword = async function() {
+            const email = document.getElementById('email').value.trim();
+            
+            if (!email) {
+                showMessage('Please enter your email address first', 'error');
+                return;
+            }
+            
+            if (!validateEmail(email)) {
+                showMessage('Please enter a valid email address', 'error');
+                return;
+            }
+            
+            try {
+                await sendPasswordResetEmail(auth, email);
+                showMessage('Password reset email sent! Check your inbox.', 'success');
+            } catch (error) {
+                console.error('Password reset error:', error);
                 showMessage(getFirebaseErrorMessage(error.code), 'error');
             }
         };
 
         function getFirebaseErrorMessage(errorCode) {
-            switch (errorCode) {
-                case 'auth/user-not-found':
-                    return 'No account found with this email address.';
-                case 'auth/wrong-password':
-                    return 'Incorrect password.';
-                case 'auth/email-already-in-use':
-                    return 'An account with this email already exists.';
-                case 'auth/weak-password':
-                    return 'Password is too weak. Please use at least 6 characters.';
-                case 'auth/invalid-email':
-                    return 'Please enter a valid email address.';
-                case 'auth/too-many-requests':
-                    return 'Too many failed attempts. Please try again later.';
-                default:
-                    return 'An error occurred. Please try again.';
-            }
+            const errorMessages = {
+                'auth/user-not-found': 'No account found with this email address.',
+                'auth/wrong-password': 'Incorrect password.',
+                'auth/email-already-in-use': 'An account with this email already exists.',
+                'auth/weak-password': 'Password is too weak. Please use a stronger password.',
+                'auth/invalid-email': 'Please enter a valid email address.',
+                'auth/too-many-requests': 'Too many failed attempts. Please try again later.',
+                'auth/user-disabled': 'This account has been disabled.',
+                'auth/operation-not-allowed': 'Email/password accounts are not enabled.',
+                'auth/network-request-failed': 'Network error. Please check your connection.',
+                'auth/timeout': 'Request timed out. Please try again.',
+                'auth/invalid-credential': 'Invalid email or password.',
+                'auth/user-token-expired': 'Your session has expired. Please try again.',
+                'auth/requires-recent-login': 'Please log out and log back in to continue.'
+            };
+            
+            return errorMessages[errorCode] || 'An unexpected error occurred. Please try again.';
         }
+
+        // Password strength indicator
+        window.updatePasswordRequirements = function(password) {
+            const requirements = validatePassword(password);
+            
+            Object.keys(requirements).forEach(req => {
+                const element = document.getElementById(`req-${req}`);
+                if (element) {
+                    element.className = requirements[req] ? 'requirement met' : 'requirement unmet';
+                }
+            });
+        };
     </script>
 
     <script>
         let isLoginMode = false;
+        let isSubmitting = false;
 
-        // Global functions for authentication
+        // Global functions for authentication UI
         function showLogin() {
             isLoginMode = true;
             updateModalContent();
@@ -1025,6 +1272,10 @@
 
         function showModal() {
             document.getElementById('authModal').style.display = 'block';
+            // Auto-focus email field for better UX
+            setTimeout(() => {
+                document.getElementById('email').focus();
+            }, 300);
         }
 
         function closeModal() {
@@ -1048,6 +1299,7 @@
             const confirmPasswordGroup = document.getElementById('confirmPasswordGroup');
             const confirmPasswordInput = document.getElementById('confirmPassword');
             const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+            const passwordRequirements = document.getElementById('passwordRequirements');
 
             if (isLoginMode) {
                 title.textContent = 'Welcome Back';
@@ -1058,6 +1310,7 @@
                 confirmPasswordGroup.style.display = 'none';
                 confirmPasswordInput.required = false;
                 forgotPasswordLink.style.display = 'block';
+                passwordRequirements.style.display = 'none';
             } else {
                 title.textContent = 'Create Account';
                 subtitle.textContent = 'Join thousands of researchers discovering knowledge';
@@ -1067,12 +1320,8 @@
                 confirmPasswordGroup.style.display = 'block';
                 confirmPasswordInput.required = true;
                 forgotPasswordLink.style.display = 'none';
+                passwordRequirements.style.display = 'block';
             }
-        }
-
-        function showMessage(text, type) {
-            const container = document.getElementById('messageContainer');
-            container.innerHTML = `<div class="${type}-message">${text}</div>`;
         }
 
         function clearMessages() {
@@ -1081,31 +1330,76 @@
 
         function resetForm() {
             document.getElementById('authForm').reset();
+            // Reset password requirements display
+            const requirements = document.querySelectorAll('.requirement');
+            requirements.forEach(req => {
+                req.className = 'requirement unmet';
+            });
         }
 
-        // Handle form submission
-        document.getElementById('authForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            if (isLoginMode) {
-                await window.handleLogin(e);
-            } else {
-                await window.handleSignup(e);
-            }
+        // Enhanced form handling
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('authForm');
+            const passwordInput = document.getElementById('password');
+            const confirmPasswordInput = document.getElementById('confirmPassword');
+
+            // Password strength indicator
+            passwordInput.addEventListener('input', function() {
+                if (!isLoginMode) {
+                    window.updatePasswordRequirements(this.value);
+                }
+            });
+
+            // Real-time password confirmation
+            confirmPasswordInput.addEventListener('input', function() {
+                const password = passwordInput.value;
+                const confirmPassword = this.value;
+                
+                if (confirmPassword && password !== confirmPassword) {
+                    this.style.borderColor = '#dc3545';
+                } else {
+                    this.style.borderColor = '';
+                }
+            });
+
+            // Handle form submission
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                if (isSubmitting) return; // Prevent double submission
+                
+                if (isLoginMode) {
+                    await window.handleLogin(e);
+                } else {
+                    await window.handleSignup(e);
+                }
+            });
         });
 
         // Close modal when clicking outside
-        window.onclick = function(event) {
+        window.addEventListener('click', function(event) {
             const modal = document.getElementById('authModal');
-            if (event.target == modal) {
+            if (event.target === modal) {
                 closeModal();
             }
-        }
+        });
 
         // Close modal on escape key
         document.addEventListener('keydown', function(event) {
             if (event.key === 'Escape') {
                 closeModal();
+            }
+        });
+
+        // Prevent form submission on Enter if requirements not met
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter' && !isLoginMode) {
+                const password = document.getElementById('password').value;
+                const requirements = window.validatePassword ? window.validatePassword(password) : {};
+                
+                if (!Object.values(requirements).every(req => req)) {
+                    event.preventDefault();
+                }
             }
         });
     </script>
