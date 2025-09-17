@@ -774,6 +774,15 @@
     </script>
 
     <script>
+        // Make showLogin and showSignup available globally (for compatibility)
+        window.showLogin = function() {
+            showAuth('login');
+        };
+
+        window.showSignup = function() {
+            showAuth('signup');
+        };
+
         function showAuth(type) {
             const modal = document.getElementById('authModal');
             const loginForm = document.getElementById('loginForm');
