@@ -918,4 +918,147 @@
 
                 <h3>Research Summary:</h3>
                 <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
-                    ${data.summary || 'Research summary not available.
+                    ${data.summary || 'Research summary not available.'}
+                </div>
+
+                <h3>Key Sources Found:</h3>
+                <div id="sources-preview">
+                    ${data.sources ? data.sources.map(source => `
+                        <div class="source-preview">
+                            <div class="source-title">${source.title}</div>
+                            <div class="source-meta">${source.url}</div>
+                            <div style="font-size: 0.9rem; margin-top: 0.5rem; color: #555;">${source.quote}</div>
+                        </div>
+                    `).join('') : '<p>No sources available</p>'}
+                </div>
+
+                <div class="download-section">
+                    <h3>Your Research Report is Ready!</h3>
+                    <p>Professional report with citations and methodology</p>
+                    <div style="margin-top: 1rem;">
+                        <button class="btn" style="background: white; color: #8b4513; margin-right: 1rem;">
+                            📄 Download PDF (Coming Soon)
+                        </button>
+                        <button class="btn" style="background: transparent; border: 2px solid white; color: white;">
+                            📧 Email Report (Coming Soon)
+                        </button>
+                    </div>
+                </div>
+
+                <button class="btn btn-secondary" onclick="startNewResearch()" style="margin-top: 1rem;">
+                    Start New Research
+                </button>
+            `;
+            
+            document.getElementById('results').innerHTML = resultsHtml;
+            document.getElementById('results-section').style.display = 'block';
+        }
+
+        function simulateProcessing() {
+            currentStep = 0;
+            const stepElements = document.querySelectorAll('.processing-step');
+            
+            // Reset all steps
+            stepElements.forEach(step => {
+                step.classList.remove('active', 'completed');
+            });
+
+            // Start first step immediately
+            if (stepElements.length > 0) {
+                stepElements[0].classList.add('active');
+                currentStep = 1;
+            }
+
+            // Animate through remaining steps
+            const interval = setInterval(() => {
+                if (currentStep > 1) {
+                    stepElements[currentStep - 2].classList.remove('active');
+                    stepElements[currentStep - 2].classList.add('completed');
+                }
+                
+                if (currentStep < stepElements.length) {
+                    stepElements[currentStep].classList.add('active');
+                    
+                    // Create crumbs for each step
+                    createCrumbs();
+                    
+                    currentStep++;
+                } else {
+                    // Complete final step
+                    stepElements[stepElements.length - 1].classList.remove('active');
+                    stepElements[stepElements.length - 1].classList.add('completed');
+                    clearInterval(interval);
+                }
+            }, 1500);
+        }
+
+        function createCrumbs() {
+            const container = document.querySelector('.cookie-container');
+            const numCrumbs = Math.floor(Math.random() * 5) + 3; // 3-7 crumbs
+            
+            for (let i = 0; i < numCrumbs; i++) {
+                const crumb = document.createElement('div');
+                crumb.className = 'crumb';
+                
+                // Random position around the cookie
+                const angle = Math.random() * 360;
+                const distance = 50 + Math.random() * 30;
+                const x = 100 + Math.cos(angle * Math.PI / 180) * distance;
+                const y = 100 + Math.sin(angle * Math.PI / 180) * distance;
+                
+                crumb.style.left = x + 'px';
+                crumb.style.top = y + 'px';
+                
+                container.appendChild(crumb);
+                
+                // Start falling animation
+                setTimeout(() => {
+                    crumb.classList.add('falling');
+                }, i * 150);
+                
+                // Remove after animation
+                setTimeout(() => {
+                    if (crumb.parentNode) {
+                        crumb.parentNode.removeChild(crumb);
+                    }
+                }, 2200);
+            }
+        }
+
+        function startNewResearch() {
+            document.getElementById('results-section').style.display = 'none';
+            document.getElementById('input-section').style.display = 'block';
+            document.getElementById('research-question').value = '';
+            document.getElementById('research-question').focus();
+        }
+
+        function showExamples() {
+            const examples = [
+                'Impact of artificial intelligence on job displacement',
+                'Effectiveness of meditation on anxiety reduction',
+                'Climate change effects on coral reef ecosystems',
+                'Blockchain technology applications in healthcare',
+                'Remote learning effectiveness during COVID-19'
+            ];
+            
+            const randomExample = examples[Math.floor(Math.random() * examples.length)];
+            document.getElementById('research-question').value = randomExample;
+        }
+
+        // Usage limits constant for client-side validation
+        const USAGE_LIMITS = {
+            free: { monthly: 3, maxTokens: 1500 },
+            starter: { monthly: 15, maxTokens: 2000 },
+            pro: { monthly: 30, maxTokens: 3000 },
+            research: { monthly: 60, maxTokens: 4000 },
+            enterprise: { monthly: 200, maxTokens: 5000 }
+        };
+
+        // Auto-resize textarea
+        document.getElementById('research-question').addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.max(80, this.scrollHeight) + 'px';
+        });
+    </script>
+</body>
+</html>
