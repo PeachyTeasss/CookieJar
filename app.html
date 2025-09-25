@@ -74,6 +74,17 @@
             font-size: 0.9rem;
         }
 
+        .tier-badge {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: #333;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-left: 0.5rem;
+        }
+
         .loading-screen {
             position: fixed;
             top: 0;
@@ -421,6 +432,19 @@
             margin-bottom: 0.5rem;
         }
 
+        .upgrade-prompt {
+            background: linear-gradient(135deg, #8b4513, #d2691e);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .upgrade-prompt h3 {
+            margin-bottom: 1rem;
+        }
+
         @media (max-width: 768px) {
             .main-container {
                 padding: 0 10px;
@@ -462,7 +486,10 @@
             </div>
             <div class="user-info">
                 <div class="user-email" id="userEmail">user@example.com</div>
-                <div class="credits">13 reports remaining</div>
+                <div class="credits" id="creditsDisplay">
+                    <span id="reportsRemaining">Loading...</span> reports remaining
+                    <span class="tier-badge" id="tierBadge">FREE</span>
+                </div>
                 <button class="btn btn-secondary" onclick="logout()">Logout</button>
             </div>
         </div>
@@ -489,6 +516,15 @@
                 </button>
                 <button class="btn btn-secondary" onclick="showExamples()">
                     See Examples
+                </button>
+            </div>
+
+            <!-- Upgrade prompt for users near limit -->
+            <div id="upgradePrompt" class="upgrade-prompt" style="display: none;">
+                <h3>Almost out of reports!</h3>
+                <p>You have <span id="remainingCount">1</span> report(s) left this month.</p>
+                <button class="btn" style="background: white; color: #8b4513; margin-top: 1rem;">
+                    Upgrade to Starter Plan - $7/month
                 </button>
             </div>
         </div>
@@ -561,6 +597,7 @@
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, Timestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
         // Your Firebase configuration
         const firebaseConfig = {
@@ -576,6 +613,19 @@
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Usage limits
+        const USAGE_LIMITS = {
+            free: { monthly: 3, maxTokens: 1500 },
+            starter: { monthly: 15, maxTokens: 2000 },
+            pro: { monthly: 30, maxTokens: 3000 },
+            research: { monthly: 60, maxTokens: 4000 },
+            enterprise: { monthly: 200, maxTokens: 5000 }
+        };
+
+        let currentUser = null;
+        let userUsageData = null;
 
         // Make logout function available globally
         window.logout = async function() {
@@ -587,8 +637,132 @@
             }
         };
 
+        // Real usage tracking functions
+        async function getUserUsage(userId) {
+            try {
+                const userRef = doc(db, 'usage', userId);
+                const userDoc = await getDoc(userRef);
+                
+                const now = new Date();
+                const currentMonth = now.getMonth();
+                const currentYear = now.getFullYear();
+                
+                if (!userDoc.exists()) {
+                    // Create new user usage record
+                    const newUserData = {
+                        monthly_count: 0,
+                        tier: 'free',
+                        last_reset_month: currentMonth,
+                        last_reset_year: currentYear,
+                        created_at: Timestamp.now(),
+                        total_reports: 0
+                    };
+                    
+                    await setDoc(userRef, newUserData);
+                    return newUserData;
+                } else {
+                    const userData = userDoc.data();
+                    
+                    // Reset if new month
+                    if (userData.last_reset_month !== currentMonth || userData.last_reset_year !== currentYear) {
+                        const resetData = {
+                            ...userData,
+                            monthly_count: 0,
+                            last_reset_month: currentMonth,
+                            last_reset_year: currentYear
+                        };
+                        
+                        await updateDoc(userRef, {
+                            monthly_count: 0,
+                            last_reset_month: currentMonth,
+                            last_reset_year: currentYear
+                        });
+                        
+                        return resetData;
+                    }
+                    
+                    return userData;
+                }
+            } catch (error) {
+                console.error('Error getting user usage:', error);
+                return { monthly_count: 0, tier: 'free', total_reports: 0 };
+            }
+        }
+
+        async function updateUserUsage(userId) {
+            try {
+                const userRef = doc(db, 'usage', userId);
+                const userDoc = await getDoc(userRef);
+                
+                if (userDoc.exists()) {
+                    const userData = userDoc.data();
+                    await updateDoc(userRef, {
+                        monthly_count: userData.monthly_count + 1,
+                        total_reports: (userData.total_reports || 0) + 1,
+                        last_used: Timestamp.now()
+                    });
+                }
+            } catch (error) {
+                console.error('Error updating user usage:', error);
+            }
+        }
+
+        function updateUIWithUsage(usageData) {
+            const tier = usageData.tier || 'free';
+            const monthlyLimit = USAGE_LIMITS[tier].monthly;
+            const used = usageData.monthly_count || 0;
+            const remaining = Math.max(0, monthlyLimit - used);
+            
+            // Update credits display
+            const reportsRemainingElement = document.getElementById('reportsRemaining');
+            const tierBadgeElement = document.getElementById('tierBadge');
+            
+            if (reportsRemainingElement) {
+                reportsRemainingElement.textContent = remaining;
+            }
+            
+            if (tierBadgeElement) {
+                tierBadgeElement.textContent = tier.toUpperCase();
+                tierBadgeElement.style.background = getTierColor(tier);
+            }
+            
+            // Show upgrade prompt if running low
+            const upgradePrompt = document.getElementById('upgradePrompt');
+            const remainingCountElement = document.getElementById('remainingCount');
+            
+            if (remaining <= 2 && tier === 'free') {
+                if (upgradePrompt) upgradePrompt.style.display = 'block';
+                if (remainingCountElement) remainingCountElement.textContent = remaining;
+            } else {
+                if (upgradePrompt) upgradePrompt.style.display = 'none';
+            }
+            
+            // Disable research button if no reports remaining
+            const researchButton = document.getElementById('start-research');
+            if (researchButton) {
+                if (remaining <= 0) {
+                    researchButton.disabled = true;
+                    researchButton.textContent = 'Monthly Limit Reached - Upgrade to Continue';
+                } else {
+                    researchButton.disabled = false;
+                    researchButton.textContent = 'Generate Research Report';
+                }
+            }
+        }
+
+        function getTierColor(tier) {
+            const colors = {
+                free: 'linear-gradient(45deg, #6c757d, #868e96)',
+                starter: 'linear-gradient(45deg, #28a745, #20c997)',
+                pro: 'linear-gradient(45deg, #007bff, #6610f2)',
+                research: 'linear-gradient(45deg, #fd7e14, #e83e8c)',
+                enterprise: 'linear-gradient(45deg, #FFD700, #FFA500)'
+            };
+            return colors[tier] || colors.free;
+        }
+
         // Check authentication state
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, async (user) => {
             const loadingScreen = document.getElementById('loadingScreen');
             const mainHeader = document.getElementById('mainHeader');
             const mainContent = document.getElementById('mainContent');
@@ -597,11 +771,16 @@
             if (user) {
                 // User is signed in - show the app
                 console.log('User is authenticated:', user.email);
+                currentUser = user;
                 
                 // Update UI with user info
                 if (userEmail) {
                     userEmail.textContent = user.email;
                 }
+                
+                // Get and display usage data
+                userUsageData = await getUserUsage(user.uid);
+                updateUIWithUsage(userUsageData);
                 
                 // Show main app
                 loadingScreen.style.display = 'none';
@@ -614,17 +793,41 @@
                 window.location.href = 'index.html';
             }
         });
+
+        // Make user data available globally
+        window.getCurrentUser = () => currentUser;
+        window.getUserUsageData = () => userUsageData;
+        window.updateUserUsageData = updateUserUsage;
     </script>
 
     <script>
         let currentStep = 0;
 
-        // REAL RESEARCH FUNCTION - CONNECTS TO YOUR VERCEL API
+        // REAL RESEARCH FUNCTION WITH USAGE CHECKING
         async function performResearch() {
             const question = document.getElementById('research-question').value.trim();
             
             if (!question) {
                 alert('Please enter a research question');
+                return;
+            }
+
+            // Check usage limits
+            const user = window.getCurrentUser();
+            const usageData = window.getUserUsageData();
+            
+            if (!user || !usageData) {
+                alert('Please refresh the page and try again');
+                return;
+            }
+
+            const tier = usageData.tier || 'free';
+            const monthlyLimit = USAGE_LIMITS[tier].monthly;
+            const used = usageData.monthly_count || 0;
+            const remaining = monthlyLimit - used;
+
+            if (remaining <= 0) {
+                alert('You have reached your monthly research limit. Please upgrade your plan to continue.');
                 return;
             }
 
@@ -636,15 +839,30 @@
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ question })
+                    body: JSON.stringify({ 
+                        question: question,
+                        userId: user.uid,
+                        tier: tier
+                    })
                 });
 
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
                 }
 
                 const data = await response.json();
+                
+                // Update usage locally and in database
+                if (data.success) {
+                    await window.updateUserUsageData(user.uid);
+                    // Update local usage data
+                    const updatedUsage = { ...usageData, monthly_count: used + 1 };
+                    updateUIWithUsage(updatedUsage);
+                }
+                
                 displayResults(data);
+                
             } catch (error) {
                 console.error('Research failed:', error);
                 document.getElementById('results').innerHTML = `
@@ -700,138 +918,4 @@
 
                 <h3>Research Summary:</h3>
                 <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
-                    ${data.summary || 'Research summary not available.'}
-                </div>
-
-                <h3>Key Sources Found:</h3>
-                <div id="sources-preview">
-                    ${data.sources ? data.sources.map(source => `
-                        <div class="source-preview">
-                            <div class="source-title">${source.title}</div>
-                            <div class="source-meta">${source.url}</div>
-                            <div style="font-size: 0.9rem; margin-top: 0.5rem; color: #555;">${source.quote}</div>
-                        </div>
-                    `).join('') : '<p>No sources available</p>'}
-                </div>
-
-                <div class="download-section">
-                    <h3>Your Research Report is Ready!</h3>
-                    <p>Professional report with citations and methodology</p>
-                    <div style="margin-top: 1rem;">
-                        <button class="btn" style="background: white; color: #8b4513; margin-right: 1rem;">
-                            📄 Download PDF (Coming Soon)
-                        </button>
-                        <button class="btn" style="background: transparent; border: 2px solid white; color: white;">
-                            📧 Email Report (Coming Soon)
-                        </button>
-                    </div>
-                </div>
-
-                <button class="btn btn-secondary" onclick="startNewResearch()" style="margin-top: 1rem;">
-                    Start New Research
-                </button>
-            `;
-            
-            document.getElementById('results').innerHTML = resultsHtml;
-            document.getElementById('results-section').style.display = 'block';
-        }
-
-        function simulateProcessing() {
-            currentStep = 0;
-            const stepElements = document.querySelectorAll('.processing-step');
-            
-            // Reset all steps
-            stepElements.forEach(step => {
-                step.classList.remove('active', 'completed');
-            });
-
-            // Start first step immediately
-            if (stepElements.length > 0) {
-                stepElements[0].classList.add('active');
-                currentStep = 1;
-            }
-
-            // Animate through remaining steps
-            const interval = setInterval(() => {
-                if (currentStep > 1) {
-                    stepElements[currentStep - 2].classList.remove('active');
-                    stepElements[currentStep - 2].classList.add('completed');
-                }
-                
-                if (currentStep < stepElements.length) {
-                    stepElements[currentStep].classList.add('active');
-                    
-                    // Create crumbs for each step
-                    createCrumbs();
-                    
-                    currentStep++;
-                } else {
-                    // Complete final step
-                    stepElements[stepElements.length - 1].classList.remove('active');
-                    stepElements[stepElements.length - 1].classList.add('completed');
-                    clearInterval(interval);
-                }
-            }, 1500);
-        }
-
-        function createCrumbs() {
-            const container = document.querySelector('.cookie-container');
-            const numCrumbs = Math.floor(Math.random() * 5) + 3; // 3-7 crumbs
-            
-            for (let i = 0; i < numCrumbs; i++) {
-                const crumb = document.createElement('div');
-                crumb.className = 'crumb';
-                
-                // Random position around the cookie
-                const angle = Math.random() * 360;
-                const distance = 50 + Math.random() * 30;
-                const x = 100 + Math.cos(angle * Math.PI / 180) * distance;
-                const y = 100 + Math.sin(angle * Math.PI / 180) * distance;
-                
-                crumb.style.left = x + 'px';
-                crumb.style.top = y + 'px';
-                
-                container.appendChild(crumb);
-                
-                // Start falling animation
-                setTimeout(() => {
-                    crumb.classList.add('falling');
-                }, i * 150);
-                
-                // Remove after animation
-                setTimeout(() => {
-                    if (crumb.parentNode) {
-                        crumb.parentNode.removeChild(crumb);
-                    }
-                }, 2200);
-            }
-        }
-
-        function startNewResearch() {
-            document.getElementById('results-section').style.display = 'none';
-            document.getElementById('input-section').style.display = 'block';
-            document.getElementById('research-question').value = '';
-            document.getElementById('research-question').focus();
-        }
-
-        function showExamples() {
-            const examples = [
-                'Impact of artificial intelligence on job displacement',
-                'Effectiveness of meditation on anxiety reduction',
-                'Climate change effects on coral reef ecosystems',
-                'Blockchain technology applications in healthcare',
-                'Remote learning effectiveness during COVID-19'
-            ];
-            
-            const randomExample = examples[Math.floor(Math.random() * examples.length)];
-            document.getElementById('research-question').value = randomExample;
-        }
-
-        // Auto-resize textarea
-        document.getElementById('research-question').addEventListener('input', function() {
-            this.style.height = 'auto';
-            this.style.height = Math.max(80, this.scrollHeight) + 'px';
-        });
-    </script>
-</body>
-</html>
+                    ${data.summary || 'Research summary not available.
