@@ -199,6 +199,7 @@
             opacity: 0.6;
             cursor: not-allowed;
             transform: none;
+            background: linear-gradient(45deg, #ccc, #999);
         }
 
         .btn-secondary {
@@ -493,6 +494,86 @@
             margin: 2rem 0;
             text-align: center;
             display: none;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .upgrade-prompt h3 {
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .upgrade-prompt p {
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+
+        .input-validation {
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            text-align: left;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .validation-message {
+            padding: 0.5rem;
+            border-radius: 5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .validation-error {
+            background: #ffe6e6;
+            color: #cc0000;
+            border-left: 3px solid #cc0000;
+        }
+
+        .validation-success {
+            background: #e6f7e6;
+            color: #006600;
+            border-left: 3px solid #006600;
+        }
+
+        .validation-warning {
+            background: #fff3cd;
+            color: #856404;
+            border-left: 3px solid #856404;
+        }
+
+        /* Progress bar for processing */
+        .progress-container {
+            width: 100%;
+            max-width: 400px;
+            margin: 2rem auto;
+            background: #f0f0f0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: linear-gradient(90deg, #8b4513, #d2691e);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+            width: 0%;
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            color: #666;
         }
 
         @media (max-width: 768px) {
@@ -526,6 +607,10 @@
             .summary-container {
                 padding: 1.25rem;
             }
+
+            .upgrade-prompt {
+                padding: 1rem;
+            }
         }
     </style>
 </head>
@@ -544,9 +629,9 @@
                 Cookiejar
             </div>
             <div class="user-info">
-                <div class="user-email" id="userEmail">user@example.com</div>
+                <div class="user-email" id="userEmail">Loading...</div>
                 <div class="credits">
-                    <span id="reportsRemaining">3</span> reports remaining
+                    <span id="reportsRemaining">Loading...</span> reports remaining
                     <span class="tier-badge" id="tierBadge">FREE</span>
                 </div>
                 <button class="btn btn-secondary" onclick="logout()">Logout</button>
@@ -567,11 +652,13 @@
                     placeholder="e.g., 'Impact of social media on teenage mental health' or 'Latest developments in quantum computing applications'"
                     maxlength="500"
                 ></textarea>
+                
+                <div class="input-validation" id="input-validation"></div>
             </div>
             
             <div class="input-actions">
-                <button class="btn btn-primary" id="start-research" onclick="performResearch()">
-                    Generate Research Report
+                <button class="btn btn-primary" id="start-research" onclick="performResearch()" disabled>
+                    Enter research question
                 </button>
                 <button class="btn btn-secondary" onclick="showExamples()">
                     See Examples
@@ -580,9 +667,9 @@
 
             <!-- Upgrade prompt for limit exceeded -->
             <div id="upgradePrompt" class="upgrade-prompt">
-                <h3>Usage Limit Reached!</h3>
-                <p>You've used all your free reports for this month. Upgrade to continue researching.</p>
-                <button class="btn" style="background: white; color: #8b4513; margin-top: 1rem;">
+                <h3>🚀 Usage Limit Reached!</h3>
+                <p>You've used all 3 free reports this month. Upgrade to continue researching with unlimited access to academic sources.</p>
+                <button class="btn" style="background: white; color: #8b4513; margin-top: 1rem; border: none; padding: 1rem 2rem; border-radius: 10px; font-weight: 600;">
                     Upgrade to Starter Plan - $7/month
                 </button>
             </div>
@@ -597,6 +684,11 @@
             <h2>Researching your question...</h2>
             <p>Gathering knowledge, one bite at a time 🍪</p>
             
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            <div class="progress-text" id="progress-text">Starting research...</div>
+            
             <div class="processing-steps">
                 <div class="processing-step" id="step-1">
                     <div class="step-icon">1</div>
@@ -608,7 +700,7 @@
                 </div>
                 <div class="processing-step" id="step-3">
                     <div class="step-icon">3</div>
-                    <span>Found sources</span>
+                    <span>Finding relevant sources</span>
                 </div>
                 <div class="processing-step" id="step-4">
                     <div class="step-icon">4</div>
@@ -650,6 +742,7 @@
         const auth = getAuth(app);
 
         let currentUser = null;
+        let userUsageData = { remaining: 3, used: 0, limit: 3 };
 
         window.logout = async function() {
             try {
@@ -657,10 +750,11 @@
                 window.location.href = 'index.html';
             } catch (error) {
                 console.error('Logout error:', error);
+                alert('Logout failed. Please refresh the page and try again.');
             }
         };
 
-        // Authentication check - simplified, no Firestore usage tracking
+        // Authentication check and initial usage load
         onAuthStateChanged(auth, async (user) => {
             const loadingScreen = document.getElementById('loadingScreen');
             const mainHeader = document.getElementById('mainHeader');
@@ -674,8 +768,11 @@
                 if (userEmail) {
                     userEmail.textContent = user.email;
                 }
+
+                // Load initial usage data from backend
+                await loadUserUsage();
                 
-                // Show main app - usage tracking handled entirely by backend
+                // Show main app
                 loadingScreen.style.display = 'none';
                 mainHeader.style.display = 'block';
                 mainContent.style.display = 'block';
@@ -686,29 +783,145 @@
             }
         });
 
+        // Load user usage data from backend
+        async function loadUserUsage() {
+            try {
+                const response = await fetch('https://cookiejar-api.vercel.app/api/usage', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        userId: currentUser.uid,
+                        action: 'check'
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    userUsageData = {
+                        remaining: data.remaining || 3,
+                        used: data.used || 0,
+                        limit: data.limit || 3
+                    };
+                    updateUsageDisplay();
+                } else {
+                    console.warn('Failed to load usage data, using defaults');
+                    updateUsageDisplay();
+                }
+            } catch (error) {
+                console.warn('Error loading usage data:', error);
+                updateUsageDisplay();
+            }
+        }
+
         window.getCurrentUser = () => currentUser;
+        window.getUserUsage = () => userUsageData;
     </script>
 
     <script>
         let currentStep = 0;
+        let processingInterval = null;
 
-        // Research function with backend-only usage tracking
+        // Input validation
+        function validateResearchInput(question) {
+            const issues = [];
+            const trimmed = question.trim();
+            
+            if (trimmed.length === 0) {
+                return { isValid: false, issues: ['Please enter a research question'] };
+            }
+            
+            if (trimmed.length < 10) {
+                issues.push("Question too short - add more detail (minimum 10 characters)");
+            }
+            
+            if (trimmed.length > 500) {
+                issues.push("Question too long - please shorten (maximum 500 characters)");
+            }
+            
+            const wordCount = trimmed.split(/\s+/).length;
+            if (wordCount < 3) {
+                issues.push("Use at least 3 words to describe your research topic");
+            }
+            
+            // Check for unsafe content patterns
+            const unsafePatterns = [
+                /\b(suicide|self-harm|kill myself)\b/i,
+                /\b(bomb|explosive|weapon|attack)\b/i,
+                /\b(illegal drugs|drug dealing)\b/i,
+                /\b(hack|hacking|exploit|bypass)\b/i
+            ];
+            
+            if (unsafePatterns.some(pattern => pattern.test(trimmed))) {
+                issues.push("This topic cannot be researched due to content policy");
+            }
+            
+            return {
+                isValid: issues.length === 0,
+                issues: issues
+            };
+        }
+
+        // Update input validation display
+        function updateValidationDisplay(validation) {
+            const validationContainer = document.getElementById('input-validation');
+            
+            if (!validation.isValid && validation.issues.length > 0) {
+                validationContainer.innerHTML = validation.issues.map(issue => 
+                    `<div class="validation-message validation-error">${issue}</div>`
+                ).join('');
+            } else if (validation.isValid) {
+                validationContainer.innerHTML = '<div class="validation-message validation-success">✓ Ready to research</div>';
+            } else {
+                validationContainer.innerHTML = '';
+            }
+        }
+
+        // Update usage display in header
+        function updateUsageDisplay(remaining = null) {
+            const reportsRemainingElement = document.getElementById('reportsRemaining');
+            const researchButton = document.getElementById('start-research');
+            
+            if (remaining !== null) {
+                window.getUserUsage().remaining = Math.max(0, remaining);
+            }
+            
+            const currentRemaining = window.getUserUsage().remaining;
+            
+            if (reportsRemainingElement) {
+                reportsRemainingElement.textContent = currentRemaining;
+            }
+            
+            // Disable button if no reports remaining
+            if (currentRemaining <= 0 && researchButton) {
+                researchButton.disabled = true;
+                researchButton.textContent = 'Monthly Limit Reached - Upgrade to Continue';
+                researchButton.style.background = 'linear-gradient(45deg, #ccc, #999)';
+            }
+        }
+
+        // Research function with proper error handling
         async function performResearch() {
             const question = document.getElementById('research-question').value.trim();
+            const validation = validateResearchInput(question);
             
-            if (!question) {
-                alert('Please enter a research question');
-                return;
-            }
-
-            if (question.length < 10) {
-                alert('Please enter a more detailed research question (at least 10 characters)');
+            if (!validation.isValid) {
+                updateValidationDisplay(validation);
                 return;
             }
 
             const user = window.getCurrentUser();
             if (!user) {
                 alert('Please refresh the page and try again');
+                return;
+            }
+
+            // Check usage before starting
+            const usage = window.getUserUsage();
+            if (usage.remaining <= 0) {
+                showUpgradePrompt({ 
+                    error: 'You have used all 3 free reports this month.',
+                    remaining: 0 
+                });
                 return;
             }
 
@@ -736,41 +949,43 @@
                         showUpgradePrompt(data);
                         return;
                     }
-                    throw new Error(data.error || `HTTP error! status: ${response.status}`);
+                    
+                    // Handle other errors
+                    throw new Error(data.error || `Server error: ${response.status}`);
                 }
                 
+                // Success - display results
                 displayResults(data);
                 
-                // Update the display counter after successful research
-                updateUsageDisplay(data.metadata?.remainingReports);
+                // Update the usage counter
+                if (typeof data.metadata?.remainingReports === 'number') {
+                    updateUsageDisplay(data.metadata.remainingReports);
+                }
                 
             } catch (error) {
                 console.error('Research failed:', error);
+                hideResearchProgress();
+                
+                let errorMessage = 'An unexpected error occurred.';
+                
+                if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                    errorMessage = 'Network error. Please check your connection and try again.';
+                } else if (error.message.includes('timeout')) {
+                    errorMessage = 'Request timed out. Please try again.';
+                } else if (error.message) {
+                    errorMessage = error.message;
+                }
+                
                 document.getElementById('results').innerHTML = `
                     <div class="error">
                         <h3>Research Failed</h3>
-                        <p>Sorry, there was an error processing your research: ${error.message}</p>
-                        <p>Please try again or contact support if the problem persists.</p>
+                        <p>${errorMessage}</p>
+                        <p style="margin-top: 1rem;">
+                            <button class="btn btn-primary" onclick="startNewResearch()">Try Again</button>
+                        </p>
                     </div>
                 `;
-                document.getElementById('processing-section').style.display = 'none';
                 document.getElementById('results-section').style.display = 'block';
-            }
-
-            hideResearchProgress();
-        }
-
-        function updateUsageDisplay(remaining) {
-            const reportsRemainingElement = document.getElementById('reportsRemaining');
-            if (reportsRemainingElement && typeof remaining === 'number') {
-                reportsRemainingElement.textContent = Math.max(0, remaining);
-                
-                // Disable button if no reports remaining
-                const researchButton = document.getElementById('start-research');
-                if (remaining <= 0 && researchButton) {
-                    researchButton.disabled = true;
-                    researchButton.textContent = 'Monthly Limit Reached - Upgrade to Continue';
-                }
             }
         }
 
@@ -784,6 +999,14 @@
                 
                 // Update the counter display
                 updateUsageDisplay(0);
+                
+                // Update message if provided
+                if (errorData && errorData.error) {
+                    const messageElement = upgradePrompt.querySelector('p');
+                    if (messageElement) {
+                        messageElement.textContent = errorData.error + ' Upgrade to continue researching with unlimited access to academic sources.';
+                    }
+                }
             }
         }
 
@@ -792,11 +1015,63 @@
             document.getElementById('processing-section').style.display = 'block';
             document.getElementById('results-section').style.display = 'none';
             
-            simulateProcessing();
+            simulateProcessingWithProgress();
         }
 
         function hideResearchProgress() {
-            // Called after results are displayed
+            if (processingInterval) {
+                clearInterval(processingInterval);
+                processingInterval = null;
+            }
+        }
+
+        // Enhanced processing simulation with progress bar
+        function simulateProcessingWithProgress() {
+            currentStep = 0;
+            const stepElements = document.querySelectorAll('.processing-step');
+            const progressBar = document.getElementById('progress-bar');
+            const progressText = document.getElementById('progress-text');
+            
+            stepElements.forEach(step => {
+                step.classList.remove('active', 'completed');
+            });
+
+            const stepMessages = [
+                'Analyzing your research question...',
+                'Searching PubMed database...',
+                'Searching arXiv papers...',
+                'Searching CrossRef database...',
+                'Synthesizing findings with AI...',
+                'Generating citations and report...'
+            ];
+
+            if (stepElements.length > 0) {
+                stepElements[0].classList.add('active');
+                currentStep = 1;
+                progressText.textContent = stepMessages[0];
+                progressBar.style.width = '16%';
+            }
+
+            processingInterval = setInterval(() => {
+                if (currentStep > 1) {
+                    stepElements[currentStep - 2].classList.remove('active');
+                    stepElements[currentStep - 2].classList.add('completed');
+                }
+                
+                if (currentStep < stepElements.length) {
+                    stepElements[currentStep].classList.add('active');
+                    progressText.textContent = stepMessages[currentStep] || 'Processing...';
+                    progressBar.style.width = `${Math.round((currentStep + 1) / stepElements.length * 100)}%`;
+                    currentStep++;
+                } else {
+                    stepElements[stepElements.length - 1].classList.remove('active');
+                    stepElements[stepElements.length - 1].classList.add('completed');
+                    progressBar.style.width = '100%';
+                    progressText.textContent = 'Completing research...';
+                    clearInterval(processingInterval);
+                    processingInterval = null;
+                }
+            }, 2000); // Slightly slower for better UX
         }
 
         // Format summary with better structure
@@ -809,16 +1084,20 @@
             paragraphs.forEach((paragraph, index) => {
                 const trimmed = paragraph.trim();
                 
-                if (trimmed.match(/^(\d+\.|\*\*|##|Key|Summary|Overview|Analysis|Conclusion|Finding|Result)/i)) {
-                    const title = trimmed.split(/[:.](.+)/)[0].replace(/^\d+\.?\s*|\*\*|##/g, '').trim();
-                    const content = trimmed.split(/[:.](.+)/)[1] || '';
-                    
-                    formattedContent += `
-                        <div class="summary-section">
-                            <h4 class="summary-heading">${title}</h4>
-                            <div class="summary-content">${content.trim()}</div>
-                        </div>
-                    `;
+                if (trimmed.match(/^\*\*.*?\*\*/)) {
+                    // Extract heading and content
+                    const headingMatch = trimmed.match(/^\*\*(.*?)\*\*:?\s*(.*)/s);
+                    if (headingMatch) {
+                        const title = headingMatch[1].trim();
+                        const content = headingMatch[2].trim();
+                        
+                        formattedContent += `
+                            <div class="summary-section">
+                                <h4 class="summary-heading">${title}</h4>
+                                <div class="summary-content">${content}</div>
+                            </div>
+                        `;
+                    }
                 } else {
                     formattedContent += `
                         <div class="summary-section">
@@ -839,6 +1118,7 @@
         }
 
         function displayResults(data) {
+            hideResearchProgress();
             document.getElementById('processing-section').style.display = 'none';
             
             const formattedSummary = formatSummary(data.summary || 'Research summary not available.');
@@ -878,7 +1158,7 @@
                                         <div class="source-meta">${source.source} ${source.year ? '(' + source.year + ')' : ''}</div>
                                         <div class="source-authors">${source.authors}</div>
                                         ${source.quote ? `<div class="source-quote">"${source.quote.substring(0, 150)}${source.quote.length > 150 ? '...' : ''}"</div>` : ''}
-                                        <a href="${source.url}" target="_blank" class="source-link">View Source →</a>
+                                        <a href="${source.url}" target="_blank" rel="noopener noreferrer" class="source-link">View Source →</a>
                                     </div>
                                 </div>
                             `).join('')}
@@ -890,10 +1170,10 @@
                     <h3>Your Research Report is Ready!</h3>
                     <p>Professional report with citations and methodology</p>
                     <div style="margin-top: 1rem;">
-                        <button class="btn" style="background: white; color: #8b4513; margin-right: 1rem;">
+                        <button class="btn" style="background: white; color: #8b4513; margin-right: 1rem;" onclick="downloadPDF('${data.title}')">
                             📄 Download PDF (Coming Soon)
                         </button>
-                        <button class="btn" style="background: transparent; border: 2px solid white; color: white;">
+                        <button class="btn" style="background: transparent; border: 2px solid white; color: white;" onclick="emailReport('${data.title}')">
                             📧 Email Report (Coming Soon)
                         </button>
                     </div>
@@ -906,36 +1186,9 @@
             
             document.getElementById('results').innerHTML = resultsHtml;
             document.getElementById('results-section').style.display = 'block';
-        }
-
-        function simulateProcessing() {
-            currentStep = 0;
-            const stepElements = document.querySelectorAll('.processing-step');
             
-            stepElements.forEach(step => {
-                step.classList.remove('active', 'completed');
-            });
-
-            if (stepElements.length > 0) {
-                stepElements[0].classList.add('active');
-                currentStep = 1;
-            }
-
-            const interval = setInterval(() => {
-                if (currentStep > 1) {
-                    stepElements[currentStep - 2].classList.remove('active');
-                    stepElements[currentStep - 2].classList.add('completed');
-                }
-                
-                if (currentStep < stepElements.length) {
-                    stepElements[currentStep].classList.add('active');
-                    currentStep++;
-                } else {
-                    stepElements[stepElements.length - 1].classList.remove('active');
-                    stepElements[stepElements.length - 1].classList.add('completed');
-                    clearInterval(interval);
-                }
-            }, 1500);
+            // Scroll to results
+            document.getElementById('results-section').scrollIntoView({ behavior: 'smooth' });
         }
 
         function startNewResearch() {
@@ -943,6 +1196,13 @@
             document.getElementById('input-section').style.display = 'block';
             document.getElementById('research-question').value = '';
             document.getElementById('research-question').focus();
+            document.getElementById('input-validation').innerHTML = '';
+            
+            // Reset button state
+            const button = document.getElementById('start-research');
+            button.disabled = true;
+            button.textContent = 'Enter research question';
+            button.style.background = '';
             
             // Hide upgrade prompt if it was shown
             const upgradePrompt = document.getElementById('upgradePrompt');
@@ -953,22 +1213,108 @@
 
         function showExamples() {
             const examples = [
-                'Impact of artificial intelligence on job displacement',
-                'Effectiveness of meditation on anxiety reduction',
-                'Climate change effects on coral reef ecosystems',
-                'Blockchain technology applications in healthcare',
-                'Remote learning effectiveness during COVID-19'
+                'Impact of artificial intelligence on job displacement in healthcare',
+                'Effectiveness of meditation on anxiety reduction in college students',
+                'Climate change effects on coral reef ecosystems in the Pacific',
+                'Blockchain technology applications in supply chain management',
+                'Remote learning effectiveness during COVID-19 pandemic',
+                'CRISPR gene editing ethical implications and regulations',
+                'Microplastics impact on marine food chains',
+                'Social media influence on teenage mental health outcomes'
             ];
             
             const randomExample = examples[Math.floor(Math.random() * examples.length)];
             document.getElementById('research-question').value = randomExample;
+            
+            // Trigger validation
+            const event = new Event('input', { bubbles: true });
+            document.getElementById('research-question').dispatchEvent(event);
         }
 
-        // Auto-resize textarea
-        document.getElementById('research-question').addEventListener('input', function() {
-            this.style.height = 'auto';
-            this.style.height = Math.max(80, this.scrollHeight) + 'px';
+        // Placeholder functions for future features
+        function downloadPDF(title) {
+            alert('PDF download feature coming soon! This will generate a professionally formatted PDF of your research report.');
+        }
+
+        function emailReport(title) {
+            alert('Email feature coming soon! This will send your research report to your email address.');
+        }
+
+        // Input event listener for real-time validation
+        document.addEventListener('DOMContentLoaded', function() {
+            const researchInput = document.getElementById('research-question');
+            const researchButton = document.getElementById('start-research');
+            
+            researchInput.addEventListener('input', function() {
+                const question = this.value;
+                const validation = validateResearchInput(question);
+                const usage = window.getUserUsage();
+                
+                updateValidationDisplay(validation);
+                
+                // Update button state
+                if (validation.isValid && usage.remaining > 0) {
+                    researchButton.disabled = false;
+                    researchButton.textContent = 'Generate Research Report';
+                    researchButton.style.background = '';
+                } else if (usage.remaining <= 0) {
+                    researchButton.disabled = true;
+                    researchButton.textContent = 'Monthly Limit Reached - Upgrade to Continue';
+                    researchButton.style.background = 'linear-gradient(45deg, #ccc, #999)';
+                } else if (validation.issues.length > 0) {
+                    researchButton.disabled = true;
+                    researchButton.textContent = validation.issues[0].substring(0, 50) + (validation.issues[0].length > 50 ? '...' : '');
+                    researchButton.style.background = '';
+                } else {
+                    researchButton.disabled = true;
+                    researchButton.textContent = 'Enter research question';
+                    researchButton.style.background = '';
+                }
+                
+                // Auto-resize textarea
+                this.style.height = 'auto';
+                this.style.height = Math.max(80, this.scrollHeight) + 'px';
+            });
+            
+            // Enter key handling
+            researchInput.addEventListener('keydown', function(event) {
+                if (event.key === 'Enter' && !event.shiftKey) {
+                    event.preventDefault();
+                    if (!researchButton.disabled) {
+                        performResearch();
+                    }
+                }
+            });
         });
+
+        // Error handling for network issues
+        window.addEventListener('online', function() {
+            console.log('Connection restored');
+            // Could show a notification here
+        });
+
+        window.addEventListener('offline', function() {
+            console.log('Connection lost');
+            alert('Internet connection lost. Please check your connection and try again.');
+        });
+
+        // Prevent multiple concurrent requests
+        let isResearching = false;
+        const originalPerformResearch = performResearch;
+        
+        performResearch = async function() {
+            if (isResearching) {
+                console.log('Research already in progress, ignoring duplicate request');
+                return;
+            }
+            
+            isResearching = true;
+            try {
+                await originalPerformResearch();
+            } finally {
+                isResearching = false;
+            }
+        };
     </script>
 </body>
 </html>
