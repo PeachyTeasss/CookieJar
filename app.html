@@ -75,8 +75,8 @@
         }
 
         .tier-badge {
-            background: linear-gradient(45deg, #FFD700, #FFA500);
-            color: #333;
+            background: linear-gradient(45deg, #6c757d, #868e96);
+            color: white;
             padding: 0.3rem 0.8rem;
             border-radius: 15px;
             font-size: 0.8rem;
@@ -198,6 +198,7 @@
         .btn-primary:disabled {
             opacity: 0.6;
             cursor: not-allowed;
+            transform: none;
         }
 
         .btn-secondary {
@@ -332,34 +333,6 @@
             color: #666;
         }
 
-        .source-preview {
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 1rem;
-            margin: 0.5rem 0;
-            border-left: 4px solid #8b4513;
-        }
-
-        .source-title {
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-        }
-
-        .source-meta {
-            font-size: 0.9rem;
-            color: #666;
-            margin-bottom: 0.5rem;
-        }
-
-        .download-section {
-            text-align: center;
-            padding: 2rem;
-            background: linear-gradient(135deg, #8b4513, #d2691e);
-            color: white;
-            border-radius: 15px;
-            margin-top: 2rem;
-        }
-
         .error {
             background: #ffe6e6;
             border: 1px solid #ff9999;
@@ -373,8 +346,147 @@
             margin-bottom: 0.5rem;
         }
 
-        .upgrade-prompt {
+        /* Research Summary Styles */
+        .research-summary-header h3 {
+            color: #8b4513;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+            border-bottom: 2px solid #8b4513;
+            padding-bottom: 0.5rem;
+        }
+
+        .summary-container {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border-left: 4px solid #8b4513;
+        }
+
+        .summary-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .summary-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .summary-heading {
+            color: #6b4423;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .summary-content {
+            line-height: 1.7;
+            color: #333;
+            font-size: 1rem;
+            text-align: justify;
+        }
+
+        /* Sources Section Styles */
+        .sources-section h3 {
+            color: #8b4513;
+            margin: 2rem 0 1rem 0;
+            font-size: 1.3rem;
+        }
+
+        .sources-grid {
+            display: grid;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .source-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 1.25rem;
+            display: flex;
+            gap: 1rem;
+            transition: box-shadow 0.2s ease;
+        }
+
+        .source-card:hover {
+            box-shadow: 0 4px 12px rgba(139, 69, 19, 0.1);
+        }
+
+        .source-number {
+            background: #8b4513;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .source-content {
+            flex: 1;
+        }
+
+        .source-title {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+            line-height: 1.3;
+        }
+
+        .source-meta {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            margin-bottom: 0.25rem;
+        }
+
+        .source-authors {
+            font-size: 0.85rem;
+            color: #95a5a6;
+            margin-bottom: 0.5rem;
+            font-style: italic;
+        }
+
+        .source-quote {
+            font-size: 0.9rem;
+            color: #555;
+            font-style: italic;
+            margin: 0.5rem 0;
+            padding: 0.5rem;
+            background: #f8f9fa;
+            border-radius: 4px;
+            border-left: 3px solid #8b4513;
+        }
+
+        .source-link {
+            font-size: 0.85rem;
+            color: #8b4513;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .source-link:hover {
+            color: #d2691e;
+            text-decoration: underline;
+        }
+
+        .download-section {
+            text-align: center;
+            padding: 2rem;
             background: linear-gradient(135deg, #8b4513, #d2691e);
+            color: white;
+            border-radius: 15px;
+            margin-top: 2rem;
+        }
+
+        .upgrade-prompt {
+            background: linear-gradient(135deg, #dc3545, #c82333);
             color: white;
             padding: 1.5rem;
             border-radius: 15px;
@@ -405,6 +517,15 @@
             .cookie {
                 font-size: 6rem;
             }
+            
+            .source-card {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+            
+            .summary-container {
+                padding: 1.25rem;
+            }
         }
     </style>
 </head>
@@ -425,7 +546,7 @@
             <div class="user-info">
                 <div class="user-email" id="userEmail">user@example.com</div>
                 <div class="credits">
-                    <span id="reportsRemaining">Loading...</span> reports remaining
+                    <span id="reportsRemaining">3</span> reports remaining
                     <span class="tier-badge" id="tierBadge">FREE</span>
                 </div>
                 <button class="btn btn-secondary" onclick="logout()">Logout</button>
@@ -457,10 +578,10 @@
                 </button>
             </div>
 
-            <!-- Upgrade prompt -->
+            <!-- Upgrade prompt for limit exceeded -->
             <div id="upgradePrompt" class="upgrade-prompt">
-                <h3>Almost out of reports!</h3>
-                <p>You have <span id="remainingCount">1</span> report(s) left this month.</p>
+                <h3>Usage Limit Reached!</h3>
+                <p>You've used all your free reports for this month. Upgrade to continue researching.</p>
                 <button class="btn" style="background: white; color: #8b4513; margin-top: 1rem;">
                     Upgrade to Starter Plan - $7/month
                 </button>
@@ -510,11 +631,10 @@
         </div>
     </div>
 
-    <!-- Firebase SDK -->
+    <!-- Firebase SDK for Authentication Only -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, Timestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyBoP3cMo1gFGx2LVqFtVyDLQvaedqHmf4E",
@@ -528,18 +648,8 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        const USAGE_LIMITS = {
-            free: { monthly: 3, maxTokens: 1500 },
-            starter: { monthly: 15, maxTokens: 2000 },
-            pro: { monthly: 30, maxTokens: 3000 },
-            research: { monthly: 60, maxTokens: 4000 },
-            enterprise: { monthly: 200, maxTokens: 5000 }
-        };
 
         let currentUser = null;
-        let userUsageData = null;
 
         window.logout = async function() {
             try {
@@ -550,94 +660,7 @@
             }
         };
 
-        async function getUserUsage(userId) {
-            try {
-                const userRef = doc(db, 'usage', userId);
-                const userDoc = await getDoc(userRef);
-                
-                const now = new Date();
-                const currentMonth = now.getMonth();
-                const currentYear = now.getFullYear();
-                
-                if (!userDoc.exists()) {
-                    const newUserData = {
-                        monthly_count: 0,
-                        tier: 'free',
-                        last_reset_month: currentMonth,
-                        last_reset_year: currentYear,
-                        created_at: Timestamp.now(),
-                        total_reports: 0
-                    };
-                    
-                    await setDoc(userRef, newUserData);
-                    return newUserData;
-                } else {
-                    const userData = userDoc.data();
-                    
-                    if (userData.last_reset_month !== currentMonth || userData.last_reset_year !== currentYear) {
-                        const resetData = {
-                            ...userData,
-                            monthly_count: 0,
-                            last_reset_month: currentMonth,
-                            last_reset_year: currentYear
-                        };
-                        
-                        await updateDoc(userRef, {
-                            monthly_count: 0,
-                            last_reset_month: currentMonth,
-                            last_reset_year: currentYear
-                        });
-                        
-                        return resetData;
-                    }
-                    
-                    return userData;
-                }
-            } catch (error) {
-                console.error('Error getting user usage:', error);
-                return { monthly_count: 0, tier: 'free', total_reports: 0 };
-            }
-        }
-
-        function updateUI(usageData) {
-            const tier = usageData.tier || 'free';
-            const monthlyLimit = USAGE_LIMITS[tier].monthly;
-            const used = usageData.monthly_count || 0;
-            const remaining = Math.max(0, monthlyLimit - used);
-            
-            const reportsRemainingElement = document.getElementById('reportsRemaining');
-            const tierBadgeElement = document.getElementById('tierBadge');
-            
-            if (reportsRemainingElement) {
-                reportsRemainingElement.textContent = remaining;
-            }
-            
-            if (tierBadgeElement) {
-                tierBadgeElement.textContent = tier.toUpperCase();
-            }
-            
-            const upgradePrompt = document.getElementById('upgradePrompt');
-            const remainingCountElement = document.getElementById('remainingCount');
-            
-            if (remaining <= 2 && tier === 'free') {
-                if (upgradePrompt) upgradePrompt.style.display = 'block';
-                if (remainingCountElement) remainingCountElement.textContent = remaining;
-            } else {
-                if (upgradePrompt) upgradePrompt.style.display = 'none';
-            }
-            
-            const researchButton = document.getElementById('start-research');
-            if (researchButton) {
-                if (remaining <= 0) {
-                    researchButton.disabled = true;
-                    researchButton.textContent = 'Monthly Limit Reached - Upgrade to Continue';
-                } else {
-                    researchButton.disabled = false;
-                    researchButton.textContent = 'Generate Research Report';
-                }
-            }
-        }
-
+        // Authentication check - simplified, no Firestore usage tracking
         onAuthStateChanged(auth, async (user) => {
             const loadingScreen = document.getElementById('loadingScreen');
             const mainHeader = document.getElementById('mainHeader');
@@ -652,17 +675,7 @@
                     userEmail.textContent = user.email;
                 }
                 
-                try {
-                    userUsageData = await getUserUsage(user.uid);
-                    updateUI(userUsageData);
-                } catch (error) {
-                    console.error('Error loading user usage:', error);
-                    const reportsRemainingElement = document.getElementById('reportsRemaining');
-                    if (reportsRemainingElement) {
-                        reportsRemainingElement.textContent = '3';
-                    }
-                }
-                
+                // Show main app - usage tracking handled entirely by backend
                 loadingScreen.style.display = 'none';
                 mainHeader.style.display = 'block';
                 mainContent.style.display = 'block';
@@ -674,12 +687,12 @@
         });
 
         window.getCurrentUser = () => currentUser;
-        window.getUserUsageData = () => userUsageData;
     </script>
 
     <script>
         let currentStep = 0;
 
+        // Research function with backend-only usage tracking
         async function performResearch() {
             const question = document.getElementById('research-question').value.trim();
             
@@ -717,10 +730,19 @@
                 const data = await response.json();
 
                 if (!response.ok) {
+                    // Handle specific usage limit errors
+                    if (data.code === 'USAGE_LIMIT_EXCEEDED') {
+                        hideResearchProgress();
+                        showUpgradePrompt(data);
+                        return;
+                    }
                     throw new Error(data.error || `HTTP error! status: ${response.status}`);
                 }
                 
                 displayResults(data);
+                
+                // Update the display counter after successful research
+                updateUsageDisplay(data.metadata?.remainingReports);
                 
             } catch (error) {
                 console.error('Research failed:', error);
@@ -738,6 +760,33 @@
             hideResearchProgress();
         }
 
+        function updateUsageDisplay(remaining) {
+            const reportsRemainingElement = document.getElementById('reportsRemaining');
+            if (reportsRemainingElement && typeof remaining === 'number') {
+                reportsRemainingElement.textContent = Math.max(0, remaining);
+                
+                // Disable button if no reports remaining
+                const researchButton = document.getElementById('start-research');
+                if (remaining <= 0 && researchButton) {
+                    researchButton.disabled = true;
+                    researchButton.textContent = 'Monthly Limit Reached - Upgrade to Continue';
+                }
+            }
+        }
+
+        function showUpgradePrompt(errorData) {
+            const upgradePrompt = document.getElementById('upgradePrompt');
+            if (upgradePrompt) {
+                upgradePrompt.style.display = 'block';
+                
+                // Scroll to the prompt
+                upgradePrompt.scrollIntoView({ behavior: 'smooth' });
+                
+                // Update the counter display
+                updateUsageDisplay(0);
+            }
+        }
+
         function showResearchProgress() {
             document.getElementById('input-section').style.display = 'none';
             document.getElementById('processing-section').style.display = 'block';
@@ -750,8 +799,49 @@
             // Called after results are displayed
         }
 
+        // Format summary with better structure
+        function formatSummary(summary) {
+            const sections = [];
+            const paragraphs = summary.split('\n\n').filter(p => p.trim().length > 0);
+            
+            let formattedContent = '';
+            
+            paragraphs.forEach((paragraph, index) => {
+                const trimmed = paragraph.trim();
+                
+                if (trimmed.match(/^(\d+\.|\*\*|##|Key|Summary|Overview|Analysis|Conclusion|Finding|Result)/i)) {
+                    const title = trimmed.split(/[:.](.+)/)[0].replace(/^\d+\.?\s*|\*\*|##/g, '').trim();
+                    const content = trimmed.split(/[:.](.+)/)[1] || '';
+                    
+                    formattedContent += `
+                        <div class="summary-section">
+                            <h4 class="summary-heading">${title}</h4>
+                            <div class="summary-content">${content.trim()}</div>
+                        </div>
+                    `;
+                } else {
+                    formattedContent += `
+                        <div class="summary-section">
+                            <div class="summary-content">${trimmed}</div>
+                        </div>
+                    `;
+                }
+            });
+            
+            return `
+                <div class="research-summary-header">
+                    <h3>Research Summary</h3>
+                </div>
+                <div class="summary-container">
+                    ${formattedContent}
+                </div>
+            `;
+        }
+
         function displayResults(data) {
             document.getElementById('processing-section').style.display = 'none';
+            
+            const formattedSummary = formatSummary(data.summary || 'Research summary not available.');
             
             const resultsHtml = `
                 <div class="result-header">
@@ -769,27 +859,30 @@
                         <div class="stat-label">Pages Generated</div>
                     </div>
                     <div class="stat">
-                        <div class="stat-number">${Math.max(1, Math.floor((data.sources?.length || 0) * 0.8))}</div>
+                        <div class="stat-number">${data.sources ? data.sources.length : 0}</div>
                         <div class="stat-label">Citations</div>
                     </div>
                 </div>
 
-                <h3>Research Summary:</h3>
-                <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin: 1rem 0; line-height: 1.6;">
-                    ${data.summary || 'Research summary not available.'}
-                </div>
+                ${formattedSummary}
 
                 ${data.sources && data.sources.length > 0 ? `
-                    <h3>Key Sources:</h3>
-                    <div id="sources-preview">
-                        ${data.sources.slice(0, 5).map(source => `
-                            <div class="source-preview">
-                                <div class="source-title">${source.title}</div>
-                                <div class="source-meta">${source.source} ${source.year ? '(' + source.year + ')' : ''} - ${source.authors}</div>
-                                <div style="font-size: 0.9rem; margin-top: 0.5rem; color: #555;">${source.quote || 'No preview available'}</div>
-                                <a href="${source.url}" target="_blank" style="font-size: 0.8rem; color: #8b4513;">View Source →</a>
-                            </div>
-                        `).join('')}
+                    <div class="sources-section">
+                        <h3>All Sources (${data.sources.length})</h3>
+                        <div class="sources-grid">
+                            ${data.sources.map((source, index) => `
+                                <div class="source-card">
+                                    <div class="source-number">[${index + 1}]</div>
+                                    <div class="source-content">
+                                        <div class="source-title">${source.title}</div>
+                                        <div class="source-meta">${source.source} ${source.year ? '(' + source.year + ')' : ''}</div>
+                                        <div class="source-authors">${source.authors}</div>
+                                        ${source.quote ? `<div class="source-quote">"${source.quote.substring(0, 150)}${source.quote.length > 150 ? '...' : ''}"</div>` : ''}
+                                        <a href="${source.url}" target="_blank" class="source-link">View Source →</a>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
                     </div>
                 ` : '<p>No sources found for this query.</p>'}
 
@@ -850,6 +943,12 @@
             document.getElementById('input-section').style.display = 'block';
             document.getElementById('research-question').value = '';
             document.getElementById('research-question').focus();
+            
+            // Hide upgrade prompt if it was shown
+            const upgradePrompt = document.getElementById('upgradePrompt');
+            if (upgradePrompt) {
+                upgradePrompt.style.display = 'none';
+            }
         }
 
         function showExamples() {
@@ -865,6 +964,7 @@
             document.getElementById('research-question').value = randomExample;
         }
 
+        // Auto-resize textarea
         document.getElementById('research-question').addEventListener('input', function() {
             this.style.height = 'auto';
             this.style.height = Math.max(80, this.scrollHeight) + 'px';
